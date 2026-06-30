@@ -1,0 +1,457 @@
+/* ===========================================
+   RESPONSIVE
+=========================================== */
+
+/* ================= Desktop nhỏ ================= */
+
+@media(max-width:1400px){
+
+.container{
+
+    width:95%;
+
+}
+
+}
+
+
+/* ================= Laptop ================= */
+
+@media(max-width:1200px){
+
+.hero-wrapper{
+
+    grid-template-columns:1fr;
+
+}
+
+.small-banner{
+
+    height:180px;
+
+}
+
+.product-grid{
+
+    grid-template-columns:repeat(3,1fr);
+
+}
+
+.category-grid{
+
+    grid-template-columns:repeat(4,1fr);
+
+}
+
+.brand-grid{
+
+    grid-template-columns:repeat(4,1fr);
+
+}
+
+.news-grid{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+.footer-grid{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+.products-layout{
+
+    grid-template-columns:250px 1fr;
+
+}
+
+.detail-wrapper{
+
+    grid-template-columns:1fr;
+
+}
+
+.checkout-layout{
+
+    grid-template-columns:1fr;
+
+}
+
+.profile-layout{
+
+    grid-template-columns:250px 1fr;
+
+}
+
+}
+
+
+/* ================= Tablet ================= */
+
+@media(max-width:992px){
+
+.top-header{
+
+    display:none;
+
+}
+
+.header-wrapper{
+
+    flex-wrap:wrap;
+
+}
+
+.logo{
+
+    width:100%;
+
+    text-align:center;
+
+}
+
+.search-box{
+
+    width:100%;
+
+}
+
+.header-action{
+
+    width:100%;
+
+    justify-content:center;
+
+}
+
+.navbar-menu ul{
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+
+}
+
+.service-grid{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+.product-grid{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+.category-grid{
+
+    grid-template-columns:repeat(3,1fr);
+
+}
+
+.brand-grid{
+
+    grid-template-columns:repeat(3,1fr);
+
+}
+
+.news-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+.testimonial-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+.login-box{
+
+    grid-template-columns:1fr;
+
+}
+
+.login-left{
+
+    display:none;
+
+}
+
+.products-layout{
+
+    grid-template-columns:1fr;
+
+}
+
+.sidebar{
+
+    margin-bottom:30px;
+
+}
+
+.profile-layout{
+
+    grid-template-columns:1fr;
+
+}
+
+.footer-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+}
+
+
+/* ================= Mobile ================= */
+
+@media(max-width:768px){
+
+.hero-content{
+
+    left:25px;
+
+    top:25px;
+
+}
+
+.hero-content h1{
+
+    font-size:30px;
+
+}
+
+.hero-content p{
+
+    width:100%;
+
+    font-size:15px;
+
+}
+
+.hero-slider{
+
+    height:280px;
+
+}
+
+.small-banner{
+
+    height:140px;
+
+}
+
+.section-title h2{
+
+    font-size:24px;
+
+}
+
+.product-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+.category-grid{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+.brand-grid{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+.service-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+.newsletter-box{
+
+    padding:35px;
+
+}
+
+.newsletter-box h2{
+
+    font-size:28px;
+
+}
+
+.newsletter form{
+
+    flex-direction:column;
+
+}
+
+.newsletter input{
+
+    width:100%;
+
+}
+
+.detail-button{
+
+    flex-direction:column;
+
+}
+
+.price-box{
+
+    flex-wrap:wrap;
+
+}
+
+.cart-table{
+
+    display:block;
+
+    overflow-x:auto;
+
+}
+
+.register-box{
+
+    width:100%;
+
+    padding:25px;
+
+}
+
+.register-box .row{
+
+    grid-template-columns:1fr;
+
+}
+
+.profile-menu{
+
+    margin-bottom:25px;
+
+}
+
+}
+
+
+/* ================= Mobile nhỏ ================= */
+
+@media(max-width:576px){
+
+.logo{
+
+    font-size:26px;
+
+}
+
+.header-action{
+
+    gap:15px;
+
+}
+
+.header-action span{
+
+    display:none;
+
+}
+
+.search-box input{
+
+    height:45px;
+
+}
+
+.search-box button{
+
+    height:45px;
+
+}
+
+.hero-content h1{
+
+    font-size:24px;
+
+}
+
+.hero-content p{
+
+    display:none;
+
+}
+
+.btn-buy{
+
+    padding:10px 20px;
+
+}
+
+.main-image img{
+
+    height:280px;
+
+}
+
+.thumb-list{
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+}
+
+.thumb-list img{
+
+    width:60px;
+
+    height:60px;
+
+}
+
+.product-info h1{
+
+    font-size:24px;
+
+}
+
+.price-box .new-price{
+
+    font-size:28px;
+
+}
+
+.news-card img{
+
+    height:180px;
+
+}
+
+.newsletter-box{
+
+    padding:25px;
+
+}
+
+.footer-top{
+
+    padding:40px 0;
+
+}
+
+.footer-grid{
+
+    gap:25px;
+
+}
+
+}
