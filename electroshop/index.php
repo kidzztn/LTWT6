@@ -868,32 +868,6 @@ include 'includes/navbar.php';
 
     </section>
 
-
-
-
-
-    <!-- ================= MAP ================= -->
-
-    <section class="map">
-
-        <div class="container">
-
-            <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18..."
-                width="100%"
-                height="420"
-                style="border:0;"
-                loading="lazy">
-            </iframe>
-
-        </div>
-
-    </section>
-
-
-
-
-
 </main>
 
 <?php include 'includes/footer.php'; ?>
