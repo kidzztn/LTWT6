@@ -1,6 +1,30 @@
 <?php
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/includes/cart-functions.php';
 include 'includes/header.php';
 include 'includes/navbar.php';
+
+$id = (int) ($_GET['id'] ?? 0);
+$product = null;
+$successMessage = '';
+$errorMessage = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
+    $quantity = max(1, (int) ($_POST['quantity'] ?? 1));
+    addToCart($pdo, $id, $quantity);
+    $successMessage = 'Đã thêm sản phẩm vào giỏ hàng.';
+}
+
+if ($id > 0) {
+    $stmt = $pdo->prepare('SELECT p.id, p.name, p.slug, p.price, p.stock, p.description, p.image, c.name AS category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id WHERE p.id = ?');
+    $stmt->execute([$id]);
+    $product = $stmt->fetch();
+}
+
+if (!$product) {
+    header('Location: products.php');
+    exit;
+}
 ?>
 
 <main>
@@ -15,11 +39,11 @@ include 'includes/navbar.php';
 
             <span>/</span>
 
-            <a href="products.php">Laptop</a>
+            <a href="products.php">Sản phẩm</a>
 
             <span>/</span>
 
-            <span>ASUS ROG STRIX G16</span>
+            <span><?php echo htmlspecialchars($product['name']); ?></span>
 
         </div>
 
@@ -40,7 +64,7 @@ include 'includes/navbar.php';
 
                     <div class="main-image">
 
-                        <img src="../img/products/laptop.png" alt="">
+                        <img src="<?php echo htmlspecialchars($product['image'] ?? '../img/products/default.jpg'); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
 
                     </div>
 
@@ -64,7 +88,7 @@ include 'includes/navbar.php';
 
                     <h1>
 
-                        ASUS ROG STRIX G16 RTX4060
+                        <?php echo htmlspecialchars($product['name']); ?>
 
                     </h1>
 
@@ -80,19 +104,7 @@ include 'includes/navbar.php';
 
                         <span class="new-price">
 
-                            29.990.000₫
-
-                        </span>
-
-                        <span class="old-price">
-
-                            34.990.000₫
-
-                        </span>
-
-                        <span class="discount">
-
-                            -15%
+                            <?php echo number_format((float) $product['price'], 0, ',', '.'); ?>₫
 
                         </span>
 
@@ -116,29 +128,26 @@ include 'includes/navbar.php';
 
                     </div>
 
-                    <div class="quantity">
+                    <?php if (!empty($successMessage)): ?>
+                        <div class="alert alert-success" style="margin-bottom: 15px;"><?php echo htmlspecialchars($successMessage); ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($errorMessage)): ?>
+                        <div class="alert alert-danger" style="margin-bottom: 15px;"><?php echo htmlspecialchars($errorMessage); ?></div>
+                    <?php endif; ?>
 
-                        <label>Số lượng</label>
+                    <form method="post" style="display:block;">
+                        <input type="hidden" name="add_to_cart" value="1">
+                        <div class="quantity">
+                            <label>Số lượng</label>
+                            <input type="number" name="quantity" value="1" min="1">
+                        </div>
 
-                        <input type="number" value="1" min="1">
-
-                    </div>
-
-                    <div class="detail-button">
-
-                        <button class="buy-now">
-
-                            MUA NGAY
-
-                        </button>
-
-                        <button class="add-cart">
-
-                            THÊM GIỎ HÀNG
-
-                        </button>
-
-                    </div>
+                        <div class="detail-button">
+                            <button type="submit" class="add-cart">
+                                THÊM GIỎ HÀNG
+                            </button>
+                        </div>
+                    </form>
 
                 </div>
 
@@ -160,12 +169,7 @@ include 'includes/navbar.php';
 
             <p>
 
-                ASUS ROG STRIX G16 là mẫu laptop gaming cao cấp
-                sử dụng Intel Core i7 thế hệ mới,
-                RTX 4060,
-                RAM DDR5,
-                SSD PCIe Gen4
-                và màn hình 165Hz.
+                <?php echo nl2br(htmlspecialchars($product['description'] ?? '')); ?>
 
             </p>
 

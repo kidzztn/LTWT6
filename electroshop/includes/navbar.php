@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/cart-functions.php'; require_once __DIR__ . '/customer-auth.php'; ?>
 <header>
 
     <!-- Top Header -->
@@ -64,13 +65,20 @@
                 <!-- Right -->
                 <div class="header-action">
 
-                    <a href="login.php">
-
-                        <i class="fa-regular fa-user"></i>
-
-                        <span>Tài khoản</span>
-
-                    </a>
+                    <?php if (isCustomerLoggedIn()): ?>
+                        <a href="orders.php">
+                            <i class="fa-regular fa-user"></i>
+                            <span><?php echo htmlspecialchars(getCurrentCustomer()['name']); ?></span>
+                        </a>
+                        <a href="logout.php">
+                            <span>Đăng xuất</span>
+                        </a>
+                    <?php else: ?>
+                        <a href="login.php">
+                            <i class="fa-regular fa-user"></i>
+                            <span>Tài khoản</span>
+                        </a>
+                    <?php endif; ?>
 
                     <a href="#">
 
@@ -86,7 +94,7 @@
 
                         <span>Giỏ hàng</span>
 
-                        <div class="cart-count">0</div>
+                        <div class="cart-count"><?php echo getCartCount(); ?></div>
 
                     </a>
 

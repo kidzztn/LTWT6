@@ -73,9 +73,18 @@ function ensureDatabaseSchema(PDO $pdo): void
             email VARCHAR(150) DEFAULT NULL,
             phone VARCHAR(20) DEFAULT NULL,
             address VARCHAR(255) DEFAULT NULL,
+            password_hash VARCHAR(255) DEFAULT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
+
+    try {
+        $pdo->exec("ALTER TABLE customers ADD COLUMN password_hash VARCHAR(255) DEFAULT NULL");
+    } catch (PDOException $e) {
+        if (strpos($e->getMessage(), 'Duplicate column name') === false && strpos($e->getMessage(), 'already exists') === false) {
+            throw $e;
+        }
+    }
 
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS orders (

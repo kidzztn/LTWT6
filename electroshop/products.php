@@ -1,6 +1,43 @@
 <?php
+require_once __DIR__ . '/../config/db.php';
 include 'includes/header.php';
 include 'includes/navbar.php';
+
+$categories = $pdo->query('SELECT id, name, slug FROM categories')->fetchAll();
+$priorityOrder = ['laptop' => 0, 'dien-thoai' => 1, 'linh-kien-may-tinh' => 2];
+
+usort($categories, function ($a, $b) use ($priorityOrder) {
+    $aPriority = $priorityOrder[$a['slug']] ?? 99;
+    $bPriority = $priorityOrder[$b['slug']] ?? 99;
+
+    if ($aPriority !== $bPriority) {
+        return $aPriority <=> $bPriority;
+    }
+
+    return strcmp($a['name'], $b['name']);
+});
+
+$selectedCategorySlug = trim($_GET['category'] ?? '');
+$selectedCategory = null;
+
+if ($selectedCategorySlug !== '') {
+    $stmt = $pdo->prepare('SELECT id, name, slug FROM categories WHERE slug = ?');
+    $stmt->execute([$selectedCategorySlug]);
+    $selectedCategory = $stmt->fetch();
+}
+
+$sql = 'SELECT p.id, p.name, p.slug, p.price, p.stock, p.image, c.name AS category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id';
+$params = [];
+
+if ($selectedCategory) {
+    $sql .= ' WHERE p.category_id = ?';
+    $params[] = (int) $selectedCategory['id'];
+}
+
+$sql .= ' ORDER BY p.id DESC';
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$products = $stmt->fetchAll();
 ?>
 
 <main class="products-page">
@@ -29,21 +66,10 @@ include 'includes/navbar.php';
                         <h3>Danh mục</h3>
 
                         <ul>
-
-                            <li><input type="checkbox"> Laptop</li>
-
-                            <li><input type="checkbox"> Điện thoại</li>
-
-                            <li><input type="checkbox"> PC Gaming</li>
-
-                            <li><input type="checkbox"> Màn hình</li>
-
-                            <li><input type="checkbox"> Chuột</li>
-
-                            <li><input type="checkbox"> Bàn phím</li>
-
-                            <li><input type="checkbox"> Tai nghe</li>
-
+                            <li><a href="products.php" class="<?php echo $selectedCategory ? '' : 'active'; ?>">Tất cả sản phẩm</a></li>
+                            <?php foreach ($categories as $category): ?>
+                                <li><a href="products.php?category=<?php echo urlencode($category['slug']); ?>" class="<?php echo $selectedCategory && $selectedCategory['id'] === (int) $category['id'] ? 'active' : ''; ?>"><?php echo htmlspecialchars($category['name']); ?></a></li>
+                            <?php endforeach; ?>
                         </ul>
 
                     </div>
@@ -98,7 +124,7 @@ include 'includes/navbar.php';
 
                     <div class="product-toolbar">
 
-                        <h2>Tất cả sản phẩm</h2>
+                        <h2><?php echo $selectedCategory ? htmlspecialchars($selectedCategory['name']) : 'Tất cả sản phẩm'; ?></h2>
 
                         <select>
 
@@ -116,57 +142,30 @@ include 'includes/navbar.php';
 
                     <div class="product-grid">
 
-                        <?php for($i=1;$i<=16;$i++): ?>
-
-                        <div class="product-card">
-
-                            <span class="discount">-15%</span>
-
-                            <img src="../img/products/laptop.png" alt="">
-
-                            <h4>ASUS TUF Gaming A15</h4>
-
-                            <div class="rating">
-
-                                ★★★★★
-
-                            </div>
-
-                            <div class="price">
-
-                                <span class="new-price">
-
-                                    28.990.000₫
-
-                                </span>
-
-                                <span class="old-price">
-
-                                    31.990.000₫
-
-                                </span>
-
-                            </div>
-
-                            <div class="product-action">
-
-                                <a href="product-detail.php">
-
-                                    Xem chi tiết
-
+                        <?php if (!empty($products)): ?>
+                            <?php foreach ($products as $product): ?>
+                                <a href="product-detail.php?id=<?php echo (int) $product['id']; ?>" class="product-card" style="text-decoration:none; color:inherit; display:block;">
+                                    <img src="<?php echo htmlspecialchars($product['image'] ?? '../img/products/default.jpg'); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                                    <h4><?php echo htmlspecialchars($product['name']); ?></h4>
+                                    <p><?php echo htmlspecialchars($product['category_name'] ?? '-'); ?></p>
+                                    <div class="price">
+                                        <span class="new-price">
+                                            <?php echo number_format((float) $product['price'], 0, ',', '.'); ?>₫
+                                        </span>
+                                    </div>
+                                    <div class="product-action">
+                                        <span>Xem chi tiết</span>
+                                        <button type="button">
+                                            <i class="fa-solid fa-cart-shopping"></i>
+                                        </button>
+                                    </div>
                                 </a>
-
-                                <button>
-
-                                    <i class="fa-solid fa-cart-shopping"></i>
-
-                                </button>
-
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div style="grid-column: 1 / -1; padding: 20px; background: #f7f7f7; border-radius: 8px;">
+                                Chưa có sản phẩm nào trong danh mục này.
                             </div>
-
-                        </div>
-
-                        <?php endfor; ?>
+                        <?php endif; ?>
 
                     </div>
 
