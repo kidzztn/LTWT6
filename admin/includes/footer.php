@@ -1,4 +1,4 @@
-<script src="assets/js/admin.js"></script>
+<script src="/LTWT6/admin/assets/js/admin.js"></script>
 
 </body>
 

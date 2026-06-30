@@ -10,7 +10,7 @@
 
         <li class="active">
 
-            <a href="../admin/index.php">
+            <a href="/LTWT6/admin/index.php">
 
                 <i class="fa-solid fa-house"></i>
 
@@ -22,7 +22,7 @@
 
         <li>
 
-            <a href="../admin/products/index.php">
+            <a href="/LTWT6/admin/products/index.php">
 
                 <i class="fa-solid fa-box"></i>
 
@@ -34,7 +34,7 @@
 
         <li>
 
-            <a href="../admin/categories/index.php">
+            <a href="/LTWT6/admin/categories/index.php">
 
                 <i class="fa-solid fa-layer-group"></i>
 
@@ -46,7 +46,7 @@
 
         <li>
 
-            <a href="../admin/orders/index.php">
+            <a href="/LTWT6/admin/orders/index.php">
 
                 <i class="fa-solid fa-cart-shopping"></i>
 
@@ -58,7 +58,7 @@
 
         <li>
 
-            <a href="../admin/users/index.php">
+            <a href="/LTWT6/admin/users/index.php">
 
                 <i class="fa-solid fa-users"></i>
 
@@ -70,7 +70,7 @@
 
         <li>
 
-            <a href="../admin/logout.php">
+            <a href="/LTWT6/admin/logout.php">
 
                 <i class="fa-solid fa-right-from-bracket"></i>
 

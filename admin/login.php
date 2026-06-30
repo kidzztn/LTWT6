@@ -1,6 +1,56 @@
 <?php
-$projectRoot = basename(dirname(__DIR__));
-$adminAssetBase = '/' . $projectRoot . '/admin';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$scriptPath = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) : '';
+$adminAssetBase = '/LTWT6/admin';
+
+if ($scriptPath !== '') {
+    $adminPos = strpos($scriptPath, '/admin');
+    if ($adminPos !== false) {
+        $adminAssetBase = substr($scriptPath, 0, $adminPos + strlen('/admin'));
+    }
+}
+$loginError = '';
+
+require_once __DIR__ . '/../config/db.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    if ($username !== '' && $password !== '') {
+        $columns = $pdo->query("SHOW COLUMNS FROM admins")->fetchAll(PDO::FETCH_COLUMN);
+        $passwordColumn = in_array('password_hash', $columns, true) ? 'password_hash' : (in_array('password', $columns, true) ? 'password' : '');
+
+        if ($passwordColumn !== '') {
+            $stmt = $pdo->prepare("SELECT id, username, " . $passwordColumn . " AS admin_password, full_name FROM admins WHERE username = ?");
+            $stmt->execute([$username]);
+            $admin = $stmt->fetch();
+
+            if ($admin) {
+                $storedPassword = $admin['admin_password'];
+                $isValid = $passwordColumn === 'password_hash'
+                    ? password_verify($password, $storedPassword)
+                    : (password_verify($password, $storedPassword) || $storedPassword === $password);
+
+                if ($isValid) {
+                    $_SESSION['admin_id'] = $admin['id'];
+                    $_SESSION['admin_username'] = $admin['username'];
+                    $_SESSION['admin_full_name'] = $admin['full_name'] ?? $admin['username'];
+
+                    header('Location: ' . $adminAssetBase . '/index.php');
+                    exit;
+                }
+            }
+        }
+
+        $loginError = 'Tên đăng nhập hoặc mật khẩu không đúng.';
+    } else {
+        $loginError = 'Vui lòng nhập đầy đủ thông tin.';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -69,6 +119,10 @@ $adminAssetBase = '/' . $projectRoot . '/admin';
                         required>
 
                 </div>
+
+                <?php if (!empty($loginError)): ?>
+                    <p style="color:#E30019; margin-bottom:20px;"><?php echo htmlspecialchars($loginError); ?></p>
+                <?php endif; ?>
 
                 <button class="btn-login">
 

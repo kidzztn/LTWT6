@@ -1,6 +1,13 @@
 <?php
-$projectRoot = basename(dirname(dirname(__DIR__)));
-$adminAssetBase = '/' . $projectRoot . '/admin';
+$scriptPath = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) : '';
+$adminAssetBase = '/LTWT6/admin';
+
+if ($scriptPath !== '') {
+    $adminPos = strpos($scriptPath, '/admin');
+    if ($adminPos !== false) {
+        $adminAssetBase = substr($scriptPath, 0, $adminPos + strlen('/admin'));
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
