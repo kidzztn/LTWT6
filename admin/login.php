@@ -1,3 +1,7 @@
+<?php
+$projectRoot = basename(dirname(__DIR__));
+$adminAssetBase = '/' . $projectRoot . '/admin';
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -9,7 +13,7 @@
 
     <title>ElectroShop Admin Login</title>
 
-    <link rel="stylesheet" href="assets/css/admin.css">
+    <link rel="stylesheet" href="<?php echo $adminAssetBase; ?>/assets/css/admin.css?v=1">
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -88,7 +92,7 @@
 
 </div>
 
-<script src="assets/js/admin.js"></script>
+<script src="<?php echo $adminAssetBase; ?>/assets/js/admin.js?v=1"></script>
 
 </body>
 
