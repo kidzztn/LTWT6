@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     <div class="container">
         <div class="login-box">
             <div class="login-left">
-                <img src="../img/banner/login-banner.png" alt="">
+                <img src="../img/uploads/14.webp" alt="ElectroShop login image">
             </div>
             <div class="login-right">
                 <h2>Đăng nhập</h2>

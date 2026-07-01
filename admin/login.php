@@ -80,8 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <h1>ElectroShop</h1>
 
-            <p>Hệ thống quản trị Website Thương mại điện tử</p>
-
         </div>
 
     </div>

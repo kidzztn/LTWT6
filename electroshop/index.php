@@ -178,65 +178,65 @@ $categoryImages = [
 
             <div class="category-grid">
 
-                <a href="products.php" class="category-item">
+                <a href="products.php?category=laptop" class="category-item">
 
-                    <img src="../img/icons/laptop.png">
+                    <i class="fa-solid fa-laptop"></i>
 
                     <h4>Laptop</h4>
 
                 </a>
 
-                <a href="products.php" class="category-item">
+                <a href="products.php?category=dien-thoai" class="category-item">
 
-                    <img src="../img/icons/phone.png">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
 
                     <h4>Điện thoại</h4>
 
                 </a>
 
-                <a href="products.php" class="category-item">
+                <a href="products.php?category=linh-kien-may-tinh" class="category-item">
 
-                    <img src="../img/icons/pc.png">
+                    <i class="fa-solid fa-gamepad"></i>
 
                     <h4>PC Gaming</h4>
 
                 </a>
 
-                <a href="products.php" class="category-item">
+                <a href="products.php?category=linh-kien-may-tinh" class="category-item">
 
-                    <img src="../img/icons/headphone.png">
+                    <i class="fa-solid fa-headphones"></i>
 
                     <h4>Tai nghe</h4>
 
                 </a>
 
-                <a href="products.php" class="category-item">
+                <a href="products.php?category=linh-kien-may-tinh" class="category-item">
 
-                    <img src="../img/icons/mouse.png">
+                    <i class="fa-solid fa-mouse"></i>
 
                     <h4>Chuột</h4>
 
                 </a>
 
-                <a href="products.php" class="category-item">
+                <a href="products.php?category=linh-kien-may-tinh" class="category-item">
 
-                    <img src="../img/icons/keyboard.png">
+                    <i class="fa-solid fa-keyboard"></i>
 
                     <h4>Bàn phím</h4>
 
                 </a>
 
-                <a href="products.php" class="category-item">
+                <a href="products.php?category=linh-kien-may-tinh" class="category-item">
 
-                    <img src="../img/icons/ssd.png">
+                    <i class="fa-solid fa-memory"></i>
 
                     <h4>SSD</h4>
 
                 </a>
 
-                <a href="products.php" class="category-item">
+                <a href="products.php?category=linh-kien-may-tinh" class="category-item">
 
-                    <img src="../img/icons/ram.png">
+                    <i class="fa-solid fa-chip"></i>
 
                     <h4>RAM</h4>
 

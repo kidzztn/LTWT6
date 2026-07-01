@@ -631,11 +631,18 @@ ul{
 
 }
 
-.category-item img{
+.category-item img,
+.category-item i{
 
     width:70px;
 
     margin:auto;
+
+    display:block;
+
+    font-size:48px;
+
+    color:#ff3b3f;
 
 }
 
