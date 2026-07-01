@@ -17,7 +17,9 @@ usort($categories, function ($a, $b) use ($priorityOrder) {
     return strcmp($a['name'], $b['name']);
 });
 
+$searchQuery = trim($_GET['query'] ?? '');
 $selectedCategorySlug = trim($_GET['category'] ?? '');
+$selectedPriceFilter = trim($_GET['price'] ?? '');
 $selectedCategory = null;
 
 if ($selectedCategorySlug !== '') {
@@ -26,12 +28,43 @@ if ($selectedCategorySlug !== '') {
     $selectedCategory = $stmt->fetch();
 }
 
-$sql = 'SELECT p.id, p.name, p.slug, p.price, p.stock, p.image, c.name AS category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id';
+$sql = 'SELECT p.id, p.name, p.slug, p.price, p.stock, p.image, c.name AS category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id WHERE 1=1';
 $params = [];
 
 if ($selectedCategory) {
-    $sql .= ' WHERE p.category_id = ?';
+    $sql .= ' AND p.category_id = ?';
     $params[] = (int) $selectedCategory['id'];
+}
+
+if ($searchQuery !== '') {
+    $sql .= ' AND (p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?)';
+    $likeQuery = '%' . $searchQuery . '%';
+    $params[] = $likeQuery;
+    $params[] = $likeQuery;
+    $params[] = $likeQuery;
+}
+
+if ($selectedPriceFilter !== '') {
+    switch ($selectedPriceFilter) {
+        case 'under-10':
+            $sql .= ' AND p.price < ?';
+            $params[] = 10000000;
+            break;
+        case '10-20':
+            $sql .= ' AND p.price >= ? AND p.price < ?';
+            $params[] = 10000000;
+            $params[] = 20000000;
+            break;
+        case '20-30':
+            $sql .= ' AND p.price >= ? AND p.price < ?';
+            $params[] = 20000000;
+            $params[] = 30000000;
+            break;
+        case 'above-30':
+            $sql .= ' AND p.price >= ?';
+            $params[] = 30000000;
+            break;
+    }
 }
 
 $sql .= ' ORDER BY p.id DESC';
@@ -76,43 +109,26 @@ $products = $stmt->fetchAll();
 
                     <div class="filter-box">
 
-                        <h3>Mức giá</h3>
+                        <h3>Tìm kiếm nhanh</h3>
 
-                        <ul>
-
-                            <li><input type="checkbox"> Dưới 10 triệu</li>
-
-                            <li><input type="checkbox"> 10 - 20 triệu</li>
-
-                            <li><input type="checkbox"> 20 - 30 triệu</li>
-
-                            <li><input type="checkbox"> Trên 30 triệu</li>
-
-                        </ul>
-
-                    </div>
-
-                    <div class="filter-box">
-
-                        <h3>Thương hiệu</h3>
-
-                        <ul>
-
-                            <li><input type="checkbox"> ASUS</li>
-
-                            <li><input type="checkbox"> MSI</li>
-
-                            <li><input type="checkbox"> Dell</li>
-
-                            <li><input type="checkbox"> Lenovo</li>
-
-                            <li><input type="checkbox"> Acer</li>
-
-                            <li><input type="checkbox"> HP</li>
-
-                            <li><input type="checkbox"> Apple</li>
-
-                        </ul>
+                        <form method="get" class="filter-form">
+                            <input type="text" name="query" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="Tên sản phẩm...">
+                            <select name="category">
+                                <option value="">Tất cả danh mục</option>
+                                <?php foreach ($categories as $category): ?>
+                                    <option value="<?php echo htmlspecialchars($category['slug']); ?>" <?php echo $selectedCategory && $selectedCategory['slug'] === $category['slug'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($category['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <select name="price">
+                                <option value="">Tất cả mức giá</option>
+                                <option value="under-10" <?php echo $selectedPriceFilter === 'under-10' ? 'selected' : ''; ?>>Dưới 10 triệu</option>
+                                <option value="10-20" <?php echo $selectedPriceFilter === '10-20' ? 'selected' : ''; ?>>10 - 20 triệu</option>
+                                <option value="20-30" <?php echo $selectedPriceFilter === '20-30' ? 'selected' : ''; ?>>20 - 30 triệu</option>
+                                <option value="above-30" <?php echo $selectedPriceFilter === 'above-30' ? 'selected' : ''; ?>>Trên 30 triệu</option>
+                            </select>
+                            <button type="submit">Áp dụng</button>
+                            <a href="products.php">Bỏ lọc</a>
+                        </form>
 
                     </div>
 
@@ -124,19 +140,16 @@ $products = $stmt->fetchAll();
 
                     <div class="product-toolbar">
 
-                        <h2><?php echo $selectedCategory ? htmlspecialchars($selectedCategory['name']) : 'Tất cả sản phẩm'; ?></h2>
+                        <div>
+                            <h2><?php echo $selectedCategory ? htmlspecialchars($selectedCategory['name']) : 'Tất cả sản phẩm'; ?></h2>
+                            <p class="search-summary">
+                                <?php echo $searchQuery !== '' ? 'Kết quả cho từ khóa "' . htmlspecialchars($searchQuery) . '"' : 'Khám phá bộ sưu tập công nghệ mới nhất'; ?>
+                            </p>
+                        </div>
 
-                        <select>
-
-                            <option>Sắp xếp mới nhất</option>
-
-                            <option>Giá tăng dần</option>
-
-                            <option>Giá giảm dần</option>
-
-                            <option>Bán chạy</option>
-
-                        </select>
+                        <div class="toolbar-meta">
+                            <?php echo count($products); ?> sản phẩm
+                        </div>
 
                     </div>
 
@@ -145,9 +158,13 @@ $products = $stmt->fetchAll();
                         <?php if (!empty($products)): ?>
                             <?php foreach ($products as $product): ?>
                                 <a href="product-detail.php?id=<?php echo (int) $product['id']; ?>" class="product-card" style="text-decoration:none; color:inherit; display:block;">
-                                    <img src="<?php echo htmlspecialchars($product['image'] ?? '../img/products/default.jpg'); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                                    <img src="<?php echo htmlspecialchars(normalizeProductImagePath($product['image'] ?? null)); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                                    <p class="product-category"><?php echo htmlspecialchars($product['category_name'] ?? 'Sản phẩm'); ?></p>
                                     <h4><?php echo htmlspecialchars($product['name']); ?></h4>
-                                    <p><?php echo htmlspecialchars($product['category_name'] ?? '-'); ?></p>
+                                    <div class="product-meta">
+                                        <span class="stock-badge">Còn hàng</span>
+                                        <span class="rating">★★★★★</span>
+                                    </div>
                                     <div class="price">
                                         <span class="new-price">
                                             <?php echo number_format((float) $product['price'], 0, ',', '.'); ?>₫

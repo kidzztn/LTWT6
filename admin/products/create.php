@@ -13,12 +13,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $price = (int) ($_POST['price'] ?? 0);
     $stock = (int) ($_POST['stock'] ?? 0);
     $description = trim($_POST['description'] ?? '');
+    $imagePath = null;
+
+    if (isset($_FILES['image']) && ($_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+        $imagePath = uploadProductImage($_FILES['image']);
+        if ($imagePath === null) {
+            $errorMessage = 'Tải ảnh thất bại. Vui lòng chọn ảnh đúng định dạng.';
+        }
+    }
 
     if ($name === '' || $slug === '') {
         $errorMessage = 'Vui lòng nhập tên và slug sản phẩm.';
-    } else {
-        $stmt = $pdo->prepare('INSERT INTO products (category_id, name, slug, price, stock, description) VALUES (?, ?, ?, ?, ?, ?)');
-        $stmt->execute([$categoryId > 0 ? $categoryId : null, $name, $slug, $price, $stock, $description]);
+    } elseif ($errorMessage === '') {
+        $stmt = $pdo->prepare('INSERT INTO products (category_id, name, slug, price, stock, description, image) VALUES (?, ?, ?, ?, ?, ?, ?)');
+        $stmt->execute([$categoryId > 0 ? $categoryId : null, $name, $slug, $price, $stock, $description, $imagePath]);
         $successMessage = 'Thêm sản phẩm thành công.';
         header('Location: index.php');
         exit;
@@ -51,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <div class="table-box">
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     <div class="form-group">
                         <label>Tên sản phẩm</label>
                         <input type="text" name="name" required>
@@ -76,6 +84,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label>Tồn kho</label>
                         <input type="number" name="stock" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Ảnh sản phẩm</label>
+                        <input type="file" name="image" accept="image/*">
                     </div>
                     <div class="form-group">
                         <label>Mô tả</label>

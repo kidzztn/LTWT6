@@ -24,9 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $price = (int) ($_POST['price'] ?? 0);
     $stock = (int) ($_POST['stock'] ?? 0);
     $description = trim($_POST['description'] ?? '');
+    $imagePath = $product['image'] ?? null;
 
-    $stmt = $pdo->prepare('UPDATE products SET category_id = ?, name = ?, slug = ?, price = ?, stock = ?, description = ? WHERE id = ?');
-    $stmt->execute([$categoryId > 0 ? $categoryId : null, $name, $slug, $price, $stock, $description, $id]);
+    if (isset($_FILES['image']) && ($_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+        $uploadedImage = uploadProductImage($_FILES['image']);
+        if ($uploadedImage !== null) {
+            $imagePath = $uploadedImage;
+        }
+    }
+
+    $stmt = $pdo->prepare('UPDATE products SET category_id = ?, name = ?, slug = ?, price = ?, stock = ?, description = ?, image = ? WHERE id = ?');
+    $stmt->execute([$categoryId > 0 ? $categoryId : null, $name, $slug, $price, $stock, $description, $imagePath, $id]);
     header('Location: index.php');
     exit;
 }
@@ -49,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h2>Sửa sản phẩm</h2>
             <p>Cập nhật thông tin sản phẩm.</p>
             <div class="table-box">
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     <div class="form-group">
                         <label>Tên sản phẩm</label>
                         <input type="text" name="name" value="<?php echo htmlspecialchars($product['name']); ?>" required>
@@ -74,6 +82,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label>Tồn kho</label>
                         <input type="number" name="stock" min="0" value="<?php echo (int) $product['stock']; ?>">
+                    </div>
+                    <div class="form-group">
+                        <label>Ảnh sản phẩm</label>
+                        <input type="file" name="image" accept="image/*">
+                        <?php if (!empty($product['image'])): ?>
+                            <div style="margin-top:10px;"><img src="<?php echo htmlspecialchars($product['image']); ?>" alt="Ảnh hiện tại" style="max-width:140px; border-radius:8px;"></div>
+                        <?php endif; ?>
                     </div>
                     <div class="form-group">
                         <label>Mô tả</label>

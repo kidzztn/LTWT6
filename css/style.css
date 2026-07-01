@@ -778,7 +778,7 @@ ul{
 
 .product-card h4{
 
-    margin-top:20px;
+    margin-top:10px;
 
     font-size:18px;
 
@@ -788,6 +788,26 @@ ul{
 
 }
 
+.product-card .product-category{
+    margin-top:12px;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:#888;
+}
+
+.product-card .product-meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin:8px 0 10px;
+}
+
+.product-card .stock-badge{
+    color:var(--success);
+    font-size:13px;
+    font-weight:600;
 .rating{
 
     margin:12px 0;
@@ -860,7 +880,8 @@ ul{
 
 }
 
-.product-action button{
+.product-action button,
+.product-action .icon-btn{
 
     width:52px;
 
@@ -876,14 +897,60 @@ ul{
 
     transition:.3s;
 
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+
 }
 
-.product-action button:hover{
+.product-action button:hover,
+.product-action .icon-btn:hover{
 
     background:#004FA8;
 
 }
 
+
+/* ===========================================
+   PROMO BANNER
+=========================================== */
+
+.promo-banner{
+    margin:35px 0 20px;
+}
+
+.promo-banner-box{
+    background:linear-gradient(135deg, #111 0%, #e30019 100%);
+    color:#fff;
+    border-radius:24px;
+    padding:35px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    box-shadow:var(--shadow);
+}
+
+.promo-banner-box span{
+    display:inline-block;
+    padding:8px 14px;
+    background:rgba(255,255,255,.16);
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+.promo-banner-box h3{
+    margin:14px 0 8px;
+    font-size:28px;
+}
+
+.promo-banner-box p{
+    color:rgba(255,255,255,.86);
+    max-width:640px;
+}
 
 /* ===========================================
    MIDDLE BANNER

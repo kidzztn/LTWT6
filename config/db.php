@@ -30,6 +30,65 @@ function getPdo(): PDO
     return $pdo;
 }
 
+function uploadProductImage(array $file): ?string
+{
+    if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
+        return null;
+    }
+
+    if (($file['error'] ?? 0) !== UPLOAD_ERR_OK) {
+        return null;
+    }
+
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'];
+    $extension = strtolower(pathinfo($file['name'] ?? 'file', PATHINFO_EXTENSION));
+    if (!in_array($extension, $allowedExtensions, true)) {
+        return null;
+    }
+
+    $uploadDir = __DIR__ . '/../img/uploads';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+
+    $filename = 'product-' . time() . '-' . bin2hex(random_bytes(4)) . '.' . $extension;
+    $targetPath = $uploadDir . '/' . $filename;
+
+    if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+        return null;
+    }
+
+    return '../img/uploads/' . $filename;
+}
+
+function normalizeProductImagePath(?string $image = null): string
+{
+    $image = trim((string) ($image ?? ''));
+    if ($image === '') {
+        return '../img/products/default.svg';
+    }
+
+    if (strpos($image, 'http://') === 0 || strpos($image, 'https://') === 0) {
+        return $image;
+    }
+
+    return $image;
+}
+
+function ensureProductImages(PDO $pdo): void
+{
+    $seedImages = [
+        ['name' => 'iPhone 16 Pro Max', 'image' => '../img/uploads/1.webp'],
+        ['name' => 'Macbook Air M4', 'image' => '../img/uploads/2.webp'],
+        ['name' => 'RTX 5070', 'image' => '../img/uploads/3.webp'],
+    ];
+
+    foreach ($seedImages as $seedImage) {
+        $stmt = $pdo->prepare('UPDATE products SET image = ? WHERE LOWER(name) = LOWER(?)');
+        $stmt->execute([$seedImage['image'], $seedImage['name']]);
+    }
+}
+
 function ensureDatabaseSchema(PDO $pdo): void
 {
     $pdo->exec("
@@ -130,11 +189,13 @@ function ensureDatabaseSchema(PDO $pdo): void
 
     $productCount = (int) $pdo->query("SELECT COUNT(*) FROM products")->fetchColumn();
     if ($productCount === 0) {
-        $pdo->exec("INSERT INTO products (category_id, name, slug, price, stock, description) VALUES
-            (1, 'iPhone 16 Pro Max', 'iphone-16-pro-max', 34990000, 20, 'Flagship Apple mới nhất'),
-            (2, 'Macbook Air M4', 'macbook-air-m4', 28990000, 15, 'Laptop mỏng nhẹ hiệu năng cao'),
-            (3, 'RTX 5070', 'rtx-5070', 21500000, 10, 'Card đồ họa chơi game/AI')");
+        $pdo->exec("INSERT INTO products (category_id, name, slug, price, stock, description, image) VALUES
+            (1, 'iPhone 16 Pro Max', 'iphone-16-pro-max', 34990000, 20, 'Flagship Apple mới nhất', '../img/uploads/1.webp'),
+            (2, 'Macbook Air M4', 'macbook-air-m4', 28990000, 15, 'Laptop mỏng nhẹ hiệu năng cao', '../img/uploads/2.webp'),
+            (3, 'RTX 5070', 'rtx-5070', 21500000, 10, 'Card đồ họa chơi game/AI', '../img/uploads/3.webp')");
     }
+
+    ensureProductImages($pdo);
 
     $customerCount = (int) $pdo->query("SELECT COUNT(*) FROM customers")->fetchColumn();
     if ($customerCount === 0) {

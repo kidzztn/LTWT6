@@ -1,6 +1,20 @@
 <?php
+require_once __DIR__ . '/../config/db.php';
 include 'includes/header.php';
 include 'includes/navbar.php';
+
+$categories = $pdo->query('SELECT id, name, slug FROM categories ORDER BY id')->fetchAll();
+$featuredProducts = $pdo->query('SELECT id, name, slug, price, image FROM products ORDER BY id DESC LIMIT 8')->fetchAll();
+$categoryImages = [
+    '../img/uploads/4.webp',
+    '../img/uploads/5.webp',
+    '../img/uploads/6.webp',
+    '../img/uploads/7.webp',
+    '../img/uploads/8.webp',
+    '../img/uploads/9.webp',
+    '../img/uploads/10.webp',
+    '../img/uploads/11.webp',
+];
 ?>
 
 <main>
@@ -19,7 +33,7 @@ include 'includes/navbar.php';
 
                     <div class="hero-slider">
 
-                        <img src="../img/banner/banner1.jpg" alt="Banner">
+                        <img src="../img/uploads/1.webp" alt="Banner">
 
                         <div class="hero-content">
 
@@ -48,13 +62,13 @@ include 'includes/navbar.php';
 
                     <div class="small-banner">
 
-                        <img src="../img/banner/banner2.jpg" alt="">
+                        <img src="../img/uploads/2.webp" alt="">
 
                     </div>
 
                     <div class="small-banner">
 
-                        <img src="../img/banner/banner3.jpg" alt="">
+                        <img src="../img/uploads/3.webp" alt="">
 
                     </div>
 
@@ -118,6 +132,36 @@ include 'includes/navbar.php';
 
         </div>
 
+    </section>
+
+    <section class="promo-banner">
+        <div class="container">
+            <div class="promo-banner-box">
+                <div>
+                    <span>Ưu đãi tháng 7</span>
+                    <h3>Giảm tới 30% cho laptop gaming, điện thoại và phụ kiện cao cấp</h3>
+                    <p>Freeship, bảo hành chính hãng và hỗ trợ trả góp 0% cho đơn hàng trong tuần này.</p>
+                </div>
+                <a href="products.php?query=gaming" class="btn-buy">Mua ngay</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="category" style="padding-top: 10px;">
+        <div class="container">
+            <div class="section-title">
+                <h2>Khám phá công nghệ</h2>
+                <a href="products.php">Xem tất cả</a>
+            </div>
+            <div class="product-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                <?php foreach ($categories as $index => $category): ?>
+                    <a href="products.php?category=<?php echo urlencode($category['slug']); ?>" class="product-card" style="text-decoration:none; color:inherit; display:block; text-align:center;">
+                        <img src="<?php echo htmlspecialchars($categoryImages[$index % count($categoryImages)]); ?>" alt="<?php echo htmlspecialchars($category['name']); ?>" style="height:180px; width:100%; object-fit:cover; border-radius:12px;">
+                        <h4 style="margin-top: 15px;"><?php echo htmlspecialchars($category['name']); ?></h4>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
     </section>
 
     <!-- ================= CATEGORY ================= -->
@@ -238,33 +282,32 @@ include 'includes/navbar.php';
 
             <div class="product-grid">
 
-                <?php for($i=1;$i<=8;$i++): ?>
+                <?php foreach ($featuredProducts as $product): ?>
 
                 <div class="product-card">
 
                     <span class="discount">-20%</span>
 
-                    <img src="../img/products/laptop.png">
+                    <img src="<?php echo htmlspecialchars(normalizeProductImagePath($product['image'] ?? null)); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                    <p class="product-category">Sản phẩm nổi bật</p>
+                    <h4><?php echo htmlspecialchars($product['name']); ?></h4>
 
-                    <h4>ASUS ROG STRIX G16</h4>
-
-                    <div class="rating">
-
-                        ★★★★★
-
+                    <div class="product-meta">
+                        <span class="stock-badge">Còn hàng</span>
+                        <span class="rating">★★★★★</span>
                     </div>
 
                     <div class="price">
 
                         <span class="new-price">
 
-                            25.990.000đ
+                            <?php echo number_format((float) $product['price'], 0, ',', '.'); ?>₫
 
                         </span>
 
                         <span class="old-price">
 
-                            30.990.000đ
+                            <?php echo number_format((float) $product['price'] * 1.2, 0, ',', '.'); ?>₫
 
                         </span>
 
@@ -272,23 +315,23 @@ include 'includes/navbar.php';
 
                     <div class="product-action">
 
-                        <a href="product-detail.php">
+                        <a href="product-detail.php?id=<?php echo (int) $product['id']; ?>">
 
                             Xem chi tiết
 
                         </a>
 
-                        <button>
+                        <a href="cart.php" class="icon-btn" type="button">
 
                             <i class="fa-solid fa-cart-shopping"></i>
 
-                        </button>
+                        </a>
 
                     </div>
 
                 </div>
 
-                <?php endfor; ?>
+                <?php endforeach; ?>
 
             </div>
 

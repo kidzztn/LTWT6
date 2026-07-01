@@ -21,6 +21,13 @@ if ($id > 0) {
     $product = $stmt->fetch();
 }
 
+$relatedProducts = [];
+if ($product) {
+    $relatedStmt = $pdo->prepare('SELECT id, name, price, image FROM products WHERE category_id = ? AND id != ? ORDER BY id DESC LIMIT 4');
+    $relatedStmt->execute([(int) ($product['id'] ?? 0), (int) ($product['id'] ?? 0)]);
+    $relatedProducts = $relatedStmt->fetchAll();
+}
+
 if (!$product) {
     header('Location: products.php');
     exit;
@@ -64,7 +71,7 @@ if (!$product) {
 
                     <div class="main-image">
 
-                        <img src="<?php echo htmlspecialchars($product['image'] ?? '../img/products/default.jpg'); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                        <img src="<?php echo htmlspecialchars(normalizeProductImagePath($product['image'] ?? null)); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
 
                     </div>
 
@@ -112,17 +119,17 @@ if (!$product) {
 
                     <div class="promotion">
 
-                        <h4>Khuyến mãi</h4>
+                        <h4>Thông tin nhanh</h4>
 
                         <ul>
 
-                            <li>✔ Giảm ngay 1.000.000đ</li>
+                            <li>✔ Danh mục: <?php echo htmlspecialchars($product['category_name'] ?? 'Khác'); ?></li>
 
-                            <li>✔ Trả góp 0%</li>
+                            <li>✔ Tồn kho: <?php echo (int) $product['stock']; ?> sản phẩm</li>
 
-                            <li>✔ Tặng balo Gaming</li>
+                            <li>✔ Giao hàng: 24 giờ nội thành</li>
 
-                            <li>✔ Miễn phí giao hàng</li>
+                            <li>✔ Bảo hành chính hãng</li>
 
                         </ul>
 
@@ -251,33 +258,24 @@ if (!$product) {
 
             <div class="product-grid">
 
-                <?php for($i=1;$i<=4;$i++): ?>
-
-                <div class="product-card">
-
-                    <img src="../img/products/laptop.png">
-
-                    <h4>ASUS TUF Gaming</h4>
-
-                    <div class="price">
-
-                        <span class="new-price">
-
-                            27.990.000₫
-
-                        </span>
-
+                <?php if (!empty($relatedProducts)): ?>
+                    <?php foreach ($relatedProducts as $relatedProduct): ?>
+                        <div class="product-card">
+                            <img src="<?php echo htmlspecialchars(normalizeProductImagePath($relatedProduct['image'] ?? null)); ?>" alt="<?php echo htmlspecialchars($relatedProduct['name']); ?>">
+                            <h4><?php echo htmlspecialchars($relatedProduct['name']); ?></h4>
+                            <div class="price">
+                                <span class="new-price">
+                                    <?php echo number_format((float) $relatedProduct['price'], 0, ',', '.'); ?>₫
+                                </span>
+                            </div>
+                            <a href="product-detail.php?id=<?php echo (int) $relatedProduct['id']; ?>">Xem chi tiết</a>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div style="grid-column: 1 / -1; padding: 20px; background: #f7f7f7; border-radius: 8px;">
+                        Chưa có sản phẩm liên quan trong danh mục này.
                     </div>
-
-                    <a href="product-detail.php">
-
-                        Xem chi tiết
-
-                    </a>
-
-                </div>
-
-                <?php endfor; ?>
+                <?php endif; ?>
 
             </div>
 
