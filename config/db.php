@@ -95,11 +95,20 @@ function ensureDatabaseSchema(PDO $pdo): void
         CREATE TABLE IF NOT EXISTS admins (
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(50) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL,
+            password_hash VARCHAR(255) DEFAULT NULL,
+            password VARCHAR(255) DEFAULT NULL,
             full_name VARCHAR(100) DEFAULT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
+
+    try {
+        $pdo->exec("ALTER TABLE admins ADD COLUMN password_hash VARCHAR(255) DEFAULT NULL");
+    } catch (PDOException $e) {
+        if (strpos($e->getMessage(), 'Duplicate column name') === false && strpos($e->getMessage(), 'already exists') === false) {
+            throw $e;
+        }
+    }
 
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS categories (
@@ -171,7 +180,7 @@ function ensureDatabaseSchema(PDO $pdo): void
 
     $adminCount = (int) $pdo->query("SELECT COUNT(*) FROM admins")->fetchColumn();
     if ($adminCount === 0) {
-        $stmt = $pdo->prepare("INSERT INTO admins (username, password, full_name) VALUES (?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO admins (username, password_hash, full_name) VALUES (?, ?, ?)");
         $stmt->execute([
             'admin',
             password_hash('admin123', PASSWORD_DEFAULT),

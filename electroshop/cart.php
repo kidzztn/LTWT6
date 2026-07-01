@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         <?php foreach ($cartItems as $item): ?>
                             <tr>
                                 <td>
-                                    <img src="<?php echo htmlspecialchars($item['image'] ?? '../img/products/default.jpg'); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
+                                    <img src="<?php echo htmlspecialchars(normalizeProductImagePath($item['image'] ?? null)); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
                                 </td>
                                 <td><?php echo htmlspecialchars($item['name']); ?></td>
                                 <td><?php echo number_format($item['price'], 0, ',', '.'); ?>₫</td>

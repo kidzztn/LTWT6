@@ -32,6 +32,10 @@ if ($loggedCustomer['id'] > 0) {
     $customerProfile = $stmt->fetch();
 }
 
+if (empty($cartItems)) {
+    $errorMessage = 'Giỏ hàng đang trống. Vui lòng thêm sản phẩm trước khi thanh toán.';
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     $name = trim($_POST['name'] ?? '');
     $phone = trim($_POST['phone'] ?? '');

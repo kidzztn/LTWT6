@@ -1,6 +1,12 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/includes/customer-auth.php';
+
+if (isCustomerLoggedIn()) {
+    header('Location: index.php');
+    exit;
+}
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 
@@ -9,11 +15,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    $stmt = $pdo->prepare('SELECT id, name, email, password_hash FROM customers WHERE email = ?');
+    $stmt = $pdo->prepare('SELECT id, name, email, password_hash, password FROM customers WHERE email = ?');
     $stmt->execute([$email]);
     $customer = $stmt->fetch();
 
-    if ($customer && password_verify($password, $customer['password_hash'])) {
+    $isValid = false;
+    if ($customer) {
+        $storedHash = $customer['password_hash'] ?? '';
+        if ($storedHash !== '' && password_verify($password, $storedHash)) {
+            $isValid = true;
+        } elseif (isset($customer['password']) && $customer['password'] === $password) {
+            $isValid = true;
+        }
+    }
+
+    if ($isValid) {
         $_SESSION['customer_id'] = (int) $customer['id'];
         $_SESSION['customer_name'] = $customer['name'];
         $_SESSION['customer_email'] = $customer['email'];
