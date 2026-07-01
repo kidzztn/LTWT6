@@ -1,6 +1,12 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/includes/customer-auth.php';
+
+if (isCustomerLoggedIn()) {
+    header('Location: index.php');
+    exit;
+}
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 
@@ -26,7 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 $stmt = $pdo->prepare('INSERT INTO customers (name, email, phone, address, password_hash) VALUES (?, ?, ?, ?, ?)');
                 $stmt->execute([$name, $email, $phone, '', $hashedPassword]);
-                $message = 'Đăng ký thành công. Bạn có thể đăng nhập ngay.';
+                $customerId = (int) $pdo->lastInsertId();
+                $_SESSION['customer_id'] = $customerId;
+                $_SESSION['customer_name'] = $name;
+                $_SESSION['customer_email'] = $email;
+                header('Location: index.php');
+                exit;
             }
         } catch (Exception $e) {
             $message = 'Đăng ký thất bại: ' . $e->getMessage();

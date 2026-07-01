@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
 }
 
 if ($id > 0) {
-    $stmt = $pdo->prepare('SELECT p.id, p.name, p.slug, p.price, p.stock, p.description, p.image, c.name AS category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id WHERE p.id = ?');
+    $stmt = $pdo->prepare('SELECT p.id, p.category_id, p.name, p.slug, p.price, p.stock, p.description, p.image, c.name AS category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id WHERE p.id = ?');
     $stmt->execute([$id]);
     $product = $stmt->fetch();
 }
@@ -24,7 +24,7 @@ if ($id > 0) {
 $relatedProducts = [];
 if ($product) {
     $relatedStmt = $pdo->prepare('SELECT id, name, price, image FROM products WHERE category_id = ? AND id != ? ORDER BY id DESC LIMIT 4');
-    $relatedStmt->execute([(int) ($product['id'] ?? 0), (int) ($product['id'] ?? 0)]);
+    $relatedStmt->execute([(int) ($product['category_id'] ?? 0), (int) ($product['id'] ?? 0)]);
     $relatedProducts = $relatedStmt->fetchAll();
 }
 
