@@ -20,8 +20,8 @@
         rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="../css/style.css?v=1.2">
+    <link rel="stylesheet" href="../css/responsive.css?v=1.2">
 
 </head>
 

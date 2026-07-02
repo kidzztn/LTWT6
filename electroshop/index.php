@@ -15,6 +15,18 @@ $categoryImages = [
     '../img/uploads/10.webp',
     '../img/uploads/11.webp',
 ];
+
+// Map specific category slugs to images so labels match visuals
+$categoryImagesMap = [
+    'dien-thoai' => '../img/uploads/11.webp',
+    'laptop' => '../img/uploads/5.webp',
+    'linh-kien-may-tinh' => '../img/uploads/6.webp',
+    'pc-gaming' => '../img/uploads/7.webp',
+    'tai-nghe' => '../img/uploads/8.webp',
+    'chuot' => '../img/uploads/9.webp',
+    'ban-phim' => '../img/uploads/10.webp',
+    'ssd' => '../img/uploads/11.webp',
+];
 ?>
 
 <main>
@@ -33,7 +45,7 @@ $categoryImages = [
 
                     <div class="hero-slider">
 
-                        <img src="../img/uploads/1.webp" alt="Banner">
+                        <img src="/LTWT6/img/uploads/1.webp" alt="Banner laptop gaming" class="hero-banner-img">
 
                         <div class="hero-content">
 
@@ -62,13 +74,13 @@ $categoryImages = [
 
                     <div class="small-banner">
 
-                        <img src="../img/uploads/2.webp" alt="">
+                        <img src="/LTWT6/img/uploads/2.webp" alt="Banner khuyến mãi 1">
 
                     </div>
 
                     <div class="small-banner">
 
-                        <img src="../img/uploads/3.webp" alt="">
+                        <img src="/LTWT6/img/uploads/3.webp" alt="Banner khuyến mãi 2">
 
                     </div>
 
@@ -155,8 +167,9 @@ $categoryImages = [
             </div>
             <div class="product-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
                 <?php foreach ($categories as $index => $category): ?>
+                    <?php $img = $categoryImagesMap[$category['slug']] ?? $categoryImages[$index % count($categoryImages)]; ?>
                     <a href="products.php?category=<?php echo urlencode($category['slug']); ?>" class="product-card" style="text-decoration:none; color:inherit; display:block; text-align:center;">
-                        <img src="<?php echo htmlspecialchars($categoryImages[$index % count($categoryImages)]); ?>" alt="<?php echo htmlspecialchars($category['name']); ?>" style="height:180px; width:100%; object-fit:cover; border-radius:12px;">
+                        <img src="<?php echo htmlspecialchars($img); ?>" alt="<?php echo htmlspecialchars($category['name']); ?>" style="height:180px; width:auto; max-width:100%; object-fit:contain; border-radius:12px; margin:0 auto; display:block;">
                         <h4 style="margin-top: 15px;"><?php echo htmlspecialchars($category['name']); ?></h4>
                     </a>
                 <?php endforeach; ?>
@@ -236,7 +249,7 @@ $categoryImages = [
 
                 <a href="products.php?category=linh-kien-may-tinh" class="category-item">
 
-                    <i class="fa-solid fa-chip"></i>
+                    <i class="fa-solid fa-microchip"></i>
 
                     <h4>RAM</h4>
 
@@ -603,21 +616,21 @@ $categoryImages = [
 
             <div class="brand-grid">
 
-                <img src="../img/brands/apple.png">
+                <img src="/LTWT6/img/uploads/14.webp" alt="Apple">
 
-                <img src="../img/brands/asus.png">
+                <img src="/LTWT6/img/uploads/15.webp" alt="Asus">
 
-                <img src="../img/brands/dell.png">
+                <img src="/LTWT6/img/uploads/16.webp" alt="Dell">
 
-                <img src="../img/brands/hp.png">
+                <img src="/LTWT6/img/uploads/17.webp" alt="HP">
 
-                <img src="../img/brands/msi.png">
+                <img src="/LTWT6/img/uploads/18.webp" alt="MSI">
 
-                <img src="../img/brands/acer.png">
+                <img src="/LTWT6/img/uploads/19.webp" alt="Acer">
 
-                <img src="../img/brands/lenovo.png">
+                <img src="/LTWT6/img/uploads/20.webp" alt="Lenovo">
 
-                <img src="../img/brands/samsung.png">
+                <img src="/LTWT6/img/uploads/21.webp" alt="Samsung">
 
             </div>
 
@@ -711,7 +724,21 @@ $categoryImages = [
 
                 <div class="news-card">
 
-                    <img src="../img/banner/news1.jpg" alt="">
+                    <?php
+                        $webBase = '/LTWT6/img/uploads/';
+                        $fsBase = rtrim($_SERVER['DOCUMENT_ROOT'], "\\/") . $webBase;
+                        $macFileWebp = 'macbook-m5.webp';
+                        $macFileJpg = 'macbook-m5.jpg';
+                        $fallbackFile = '5.webp';
+                        if (file_exists($fsBase . $macFileJpg)) {
+                            $imgWeb = $webBase . $macFileJpg;
+                        } elseif (file_exists($fsBase . $macFileWebp)) {
+                            $imgWeb = $webBase . $macFileWebp;
+                        } else {
+                            $imgWeb = $webBase . $fallbackFile;
+                        }
+                    ?>
+                    <img src="<?= $imgWeb ?>" alt="MacBook Air M5">
 
                     <div class="news-content">
 
@@ -736,7 +763,20 @@ $categoryImages = [
 
                 <div class="news-card">
 
-                    <img src="../img/banner/news2.jpg" alt="">
+                    <?php
+                        $webBase = '/LTWT6/img/uploads/';
+                        $fsBase = rtrim($_SERVER['DOCUMENT_ROOT'], "\\/") . $webBase;
+                        $rtxJpg = 'rtx-6080.jpg';
+                        $rtxWebp = '6.webp';
+                        if (file_exists($fsBase . $rtxJpg)) {
+                            $news2Img = $webBase . $rtxJpg;
+                        } elseif (file_exists($fsBase . $rtxWebp)) {
+                            $news2Img = $webBase . $rtxWebp;
+                        } else {
+                            $news2Img = $webBase . '11.webp';
+                        }
+                    ?>
+                    <img src="<?= $news2Img ?>" alt="RTX 6080">
 
                     <div class="news-content">
 
@@ -761,7 +801,7 @@ $categoryImages = [
 
                 <div class="news-card">
 
-                    <img src="../img/banner/news3.jpg" alt="">
+                    <img src="../img/uploads/3.webp" alt="Gaming laptop - MSI">
 
                     <div class="news-content">
 
@@ -810,7 +850,7 @@ $categoryImages = [
 
                 <div class="testimonial-card">
 
-                    <img src="../img/avatar/avatar1.png" alt="">
+                    <img src="/LTWT6/img/uploads/user4.jpg" alt="Nguyễn Văn A">
 
                     <h4>Nguyễn Văn A</h4>
 
@@ -827,7 +867,7 @@ $categoryImages = [
 
                 <div class="testimonial-card">
 
-                    <img src="../img/avatar/avatar2.png" alt="">
+                    <img src="/LTWT6/img/uploads/user2.jpg" alt="Trần Thị B">
 
                     <h4>Trần Thị B</h4>
 
@@ -844,7 +884,7 @@ $categoryImages = [
 
                 <div class="testimonial-card">
 
-                    <img src="../img/avatar/avatar3.png" alt="">
+                    <img src="/LTWT6/img/uploads/user5.jpg" alt="Lê Minh C">
 
                     <h4>Lê Minh C</h4>
 

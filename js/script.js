@@ -15,13 +15,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 const heroImages = [
 
-    "../img/banner/banner1.jpg",
+    "/LTWT6/img/uploads/1.webp",
 
-    "../img/banner/banner2.jpg",
+    "/LTWT6/img/uploads/2.webp",
 
-    "../img/banner/banner3.jpg",
+    "/LTWT6/img/uploads/3.webp",
 
-    "../img/banner/banner4.jpg"
+    "/LTWT6/img/uploads/4.webp"
 
 ];
 
