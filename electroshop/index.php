@@ -542,57 +542,125 @@ $categoryImagesMap = [
 
             <div class="product-grid">
 
-                <?php for($i=1;$i<=8;$i++): ?>
-
                 <div class="product-card">
-
                     <span class="discount">-25%</span>
-
-                    <img src="../img/products/mouse.png" alt="">
-
-                    <h4>Logitech G Pro X Superlight</h4>
-
-                    <div class="rating">
-
-                        ★★★★★
-
-                    </div>
-
+                    <img src="/LTWT6/img/uploads/gaming-mouse-real.jpg" alt="Gaming Mouse">
+                    <h4>Chuột Gaming Razer Viper</h4>
+                    <div class="rating">★★★★★</div>
                     <div class="price">
-
-                        <span class="new-price">
-
-                            2.390.000₫
-
-                        </span>
-
-                        <span class="old-price">
-
-                            2.990.000₫
-
-                        </span>
-
+                        <span class="new-price">1.190.000₫</span>
+                        <span class="old-price">1.590.000₫</span>
                     </div>
-
                     <div class="product-action">
-
-                        <a href="product-detail.php">
-
-                            Xem chi tiết
-
-                        </a>
-
-                        <button>
-
-                            <i class="fa-solid fa-cart-shopping"></i>
-
-                        </button>
-
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-mouse"></i> Chọn máy</button>
                     </div>
-
                 </div>
 
-                <?php endfor; ?>
+                <div class="product-card">
+                    <span class="discount">-25%</span>
+                    <img src="/LTWT6/img/uploads/gaming-keyboard-real.jpg" alt="Gaming Keyboard">
+                    <h4>Bàn phím Gaming Corsair K70</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">2.090.000₫</span>
+                        <span class="old-price">2.790.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-keyboard"></i> Chọn máy</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="discount">-25%</span>
+                    <img src="/LTWT6/img/uploads/6.webp" alt="Gaming Keyboard">
+                    <h4>Bàn phím RGB HyperX</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">1.890.000₫</span>
+                        <span class="old-price">2.490.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-keyboard"></i> Chọn máy</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="discount">-25%</span>
+                    <img src="/LTWT6/img/uploads/24.webp" alt="Xiaomi Smartphone">
+                    <h4>Điện thoại Xiaomi 13</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">12.990.000₫</span>
+                        <span class="old-price">16.490.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-mobile-screen-button"></i> Chọn máy</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="discount">-25%</span>
+                    <img src="/LTWT6/img/uploads/5.webp" alt="MacBook Air">
+                    <h4>MacBook Air 15" M2</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">29.490.000₫</span>
+                        <span class="old-price">32.990.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-laptop"></i> Chọn máy</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="discount">-25%</span>
+                    <img src="/LTWT6/img/uploads/3.webp" alt="MSI Gaming Laptop">
+                    <h4>MSI Gaming 16GB RTX</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">33.990.000₫</span>
+                        <span class="old-price">39.990.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-laptop"></i> Chọn máy</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="discount">-25%</span>
+                    <img src="/LTWT6/img/uploads/7.webp" alt="Phone Stand">
+                    <h4>Móc điện thoại đa năng</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">190.000₫</span>
+                        <span class="old-price">250.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-mobile-screen-button"></i> Chọn máy</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="discount">-25%</span>
+                    <img src="/LTWT6/img/uploads/30.webp" alt="Gaming Monitor">
+                    <h4>Màn hình Gaming 27" 144Hz</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">8.490.000₫</span>
+                        <span class="old-price">10.990.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-tv"></i> Chọn máy</button>
+                    </div>
+                </div>
 
             </div>
 
@@ -656,43 +724,117 @@ $categoryImagesMap = [
 
             <div class="product-grid">
 
-                <?php for($i=1;$i<=8;$i++): ?>
-
                 <div class="product-card">
-
                     <span class="discount">Best Seller</span>
-
-                    <img src="../img/products/laptop.png" alt="">
-
-                    <h4>MacBook Air M4 16GB 512GB</h4>
-
-                    <div class="rating">
-                        ★★★★★
-                    </div>
-
+                    <img src="/LTWT6/img/uploads/1.webp" alt="MacBook Air M2">
+                    <h4>MacBook Air M2 16GB 512GB</h4>
+                    <div class="rating">★★★★★</div>
                     <div class="price">
-
-                        <span class="new-price">
-                            32.990.000₫
-                        </span>
-
+                        <span class="new-price">31.490.000₫</span>
                     </div>
-
                     <div class="product-action">
-
-                        <a href="product-detail.php">
-                            Xem chi tiết
-                        </a>
-
-                        <button>
-                            <i class="fa-solid fa-cart-shopping"></i>
-                        </button>
-
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-laptop"></i> Chọn máy</button>
                     </div>
-
                 </div>
 
-                <?php endfor; ?>
+                <div class="product-card">
+                    <span class="discount">Best Seller</span>
+                    <img src="/LTWT6/img/uploads/4.webp" alt="LG Gram Book 16">
+                    <h4>LG Gram Book 16 16GB 512GB</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">29.990.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-laptop"></i> Chọn máy</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="discount">Best Seller</span>
+                    <img src="/LTWT6/img/uploads/3.webp" alt="MSI Gaming Laptop">
+                    <h4>MSI Gaming Laptop 16GB RTX</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">38.990.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-gamepad"></i> Chọn máy</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="discount">Best Seller</span>
+                    <img src="/LTWT6/img/uploads/2.webp" alt="ASUS Vivobook Flip">
+                    <h4>ASUS Vivobook Flip 14" 8GB</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">18.990.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-laptop-code"></i> Chọn máy</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="discount">Best Seller</span>
+                    <img src="/LTWT6/img/uploads/5.webp" alt="MacBook Air 15">
+                    <h4>MacBook Air 15" 8GB 256GB</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">29.490.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-laptop"></i> Chọn máy</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="discount">Best Seller</span>
+                    <img src="/LTWT6/img/uploads/6.webp" alt="Gaming Keyboard">
+                    <h4>Razer Gaming Keyboard</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">2.490.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-keyboard"></i> Chọn máy</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="discount">Best Seller</span>
+                    <img src="/LTWT6/img/uploads/8.webp" alt="Camera Lens">
+                    <h4>Lens Máy Ảnh 50mm</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">1.290.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-camera"></i> Chọn máy</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="discount">Best Seller</span>
+                    <img src="/LTWT6/img/uploads/9.webp" alt="PS5 Controller">
+                    <h4>Tay cầm PS5 DualSense</h4>
+                    <div class="rating">★★★★★</div>
+                    <div class="price">
+                        <span class="new-price">1.190.000₫</span>
+                    </div>
+                    <div class="product-action">
+                        <a href="product-detail.php">Xem chi tiết</a>
+                        <button><i class="fa-solid fa-gamepad"></i> Chọn máy</button>
+                    </div>
+                </div>
 
             </div>
 
