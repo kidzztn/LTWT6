@@ -1,37 +1,127 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/includes/cart-functions.php';
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 
 $id = (int) ($_GET['id'] ?? 0);
+
 $product = null;
+$relatedProducts = [];
+
 $successMessage = '';
 $errorMessage = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     $quantity = max(1, (int) ($_POST['quantity'] ?? 1));
+
     addToCart($pdo, $id, $quantity);
+
     $successMessage = 'Đã thêm sản phẩm vào giỏ hàng.';
 }
 
 if ($id > 0) {
-    $stmt = $pdo->prepare('SELECT p.id, p.category_id, p.name, p.slug, p.price, p.stock, p.description, p.image, c.name AS category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id WHERE p.id = ?');
-    $stmt->execute([$id]);
-    $product = $stmt->fetch();
-}
+    $stmt = $pdo->prepare("
+        SELECT
+            p.*,
+            c.name AS category_name
+        FROM products p
+        LEFT JOIN categories c
+            ON c.id = p.category_id
+        WHERE p.id = ?
+    ");
 
-$relatedProducts = [];
-if ($product) {
-    $relatedStmt = $pdo->prepare('SELECT id, name, price, image FROM products WHERE category_id = ? AND id != ? ORDER BY id DESC LIMIT 4');
-    $relatedStmt->execute([(int) ($product['category_id'] ?? 0), (int) ($product['id'] ?? 0)]);
-    $relatedProducts = $relatedStmt->fetchAll();
+    $stmt->execute([$id]);
+
+    $product = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 if (!$product) {
     header('Location: products.php');
     exit;
 }
+
+/*
+|--------------------------------------------------------------------------
+| Gallery Images
+|--------------------------------------------------------------------------
+|
+| Cột images lưu dạng JSON:
+|
+| [
+|   "uploads/products/1.jpg",
+|   "uploads/products/2.jpg",
+|   "uploads/products/3.jpg"
+| ]
+|
+*/
+
+$galleryImages = [];
+
+if (!empty($product['images'])) {
+    $galleryImages = json_decode($product['images'], true);
+
+    if (!is_array($galleryImages)) {
+        $galleryImages = [];
+    }
+}
+
+if (empty($galleryImages) && !empty($product['image'])) {
+    $galleryImages[] = $product['image'];
+}
+
+/*
+|--------------------------------------------------------------------------
+| Specifications
+|--------------------------------------------------------------------------
+|
+| specifications lưu JSON:
+|
+| {
+|   "CPU":"Intel Core Ultra 7",
+|   "RAM":"32GB",
+|   "SSD":"1TB",
+|   "GPU":"RTX5070"
+| }
+|
+*/
+
+$specifications = [];
+
+if (!empty($product['specifications'])) {
+    $specifications = json_decode($product['specifications'], true);
+
+    if (!is_array($specifications)) {
+        $specifications = [];
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Related Products
+|--------------------------------------------------------------------------
+*/
+
+$relatedStmt = $pdo->prepare("
+    SELECT
+        id,
+        name,
+        image,
+        price
+    FROM products
+    WHERE category_id = ?
+        AND id <> ?
+    ORDER BY id DESC
+    LIMIT 4
+");
+
+$relatedStmt->execute([
+    $product['category_id'],
+    $product['id']
+]);
+
+$relatedProducts = $relatedStmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <main>
@@ -56,7 +146,6 @@ if (!$product) {
 
     </section>
 
-
     <!-- Product Detail -->
 
     <section class="product-detail">
@@ -65,39 +154,41 @@ if (!$product) {
 
             <div class="detail-wrapper">
 
-                <!-- Left -->
+                <!-- Gallery -->
 
                 <div class="product-gallery">
 
                     <div class="main-image">
 
-                        <img src="<?php echo htmlspecialchars(normalizeProductImagePath($product['image'] ?? null)); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                        <img
+                            id="mainProductImage"
+                            src="<?php echo htmlspecialchars(normalizeProductImagePath($galleryImages[0])); ?>"
+                            alt="<?php echo htmlspecialchars($product['name']); ?>"
+                        >
 
                     </div>
 
                     <div class="thumb-list">
 
-                        <img src="../img/products/laptop.png">
+                        <?php foreach ($galleryImages as $image): ?>
 
-                        <img src="../img/products/laptop.png">
+                            <img
+                                class="thumb-image"
+                                src="<?php echo htmlspecialchars(normalizeProductImagePath($image)); ?>"
+                                alt=""
+                            >
 
-                        <img src="../img/products/laptop.png">
-
-                        <img src="../img/products/laptop.png">
+                        <?php endforeach; ?>
 
                     </div>
 
                 </div>
 
-                <!-- Right -->
+                <!-- Product Info -->
 
                 <div class="product-info">
 
-                    <h1>
-
-                        <?php echo htmlspecialchars($product['name']); ?>
-
-                    </h1>
+                    <h1><?php echo htmlspecialchars($product['name']); ?></h1>
 
                     <div class="rating">
 
@@ -123,9 +214,15 @@ if (!$product) {
 
                         <ul>
 
-                            <li>✔ Danh mục: <?php echo htmlspecialchars($product['category_name'] ?? 'Khác'); ?></li>
+                            <li>
+                                ✔ Danh mục:
+                                <?php echo htmlspecialchars($product['category_name']); ?>
+                            </li>
 
-                            <li>✔ Tồn kho: <?php echo (int) $product['stock']; ?> sản phẩm</li>
+                            <li>
+                                ✔ Tồn kho:
+                                <?php echo (int) $product['stock']; ?> sản phẩm
+                            </li>
 
                             <li>✔ Giao hàng: 24 giờ nội thành</li>
 
@@ -134,26 +231,55 @@ if (!$product) {
                         </ul>
 
                     </div>
+                                        <?php if (!empty($successMessage)): ?>
 
-                    <?php if (!empty($successMessage)): ?>
-                        <div class="alert alert-success" style="margin-bottom: 15px;"><?php echo htmlspecialchars($successMessage); ?></div>
+                        <div class="alert alert-success" style="margin-bottom: 15px;">
+
+                            <?php echo htmlspecialchars($successMessage); ?>
+
+                        </div>
+
                     <?php endif; ?>
+
                     <?php if (!empty($errorMessage)): ?>
-                        <div class="alert alert-danger" style="margin-bottom: 15px;"><?php echo htmlspecialchars($errorMessage); ?></div>
+
+                        <div class="alert alert-danger" style="margin-bottom: 15px;">
+
+                            <?php echo htmlspecialchars($errorMessage); ?>
+
+                        </div>
+
                     <?php endif; ?>
 
-                    <form method="post" style="display:block;">
+                    <form method="post">
+
                         <input type="hidden" name="add_to_cart" value="1">
+
                         <div class="quantity">
+
                             <label>Số lượng</label>
-                            <input type="number" name="quantity" value="1" min="1">
+
+                            <input
+                                type="number"
+                                name="quantity"
+                                value="1"
+                                min="1"
+                                max="<?php echo (int) $product['stock']; ?>"
+                            >
+
                         </div>
 
                         <div class="detail-button">
-                            <button type="submit" class="add-cart">
+
+                            <button
+                                type="submit"
+                                class="add-cart"
+                            >
                                 THÊM GIỎ HÀNG
                             </button>
+
                         </div>
+
                     </form>
 
                 </div>
@@ -163,8 +289,6 @@ if (!$product) {
         </div>
 
     </section>
-
-
 
     <!-- Description -->
 
@@ -184,8 +308,6 @@ if (!$product) {
 
     </section>
 
-
-
     <!-- Specification -->
 
     <section class="specification">
@@ -196,45 +318,41 @@ if (!$product) {
 
             <table>
 
-                <tr>
+                <?php if (!empty($specifications)): ?>
 
-                    <td>CPU</td>
+                    <?php foreach ($specifications as $name => $value): ?>
 
-                    <td>Intel Core i7-14700HX</td>
+                        <tr>
 
-                </tr>
+                            <td>
 
-                <tr>
+                                <?php echo htmlspecialchars($name); ?>
 
-                    <td>RAM</td>
+                            </td>
 
-                    <td>16GB DDR5</td>
+                            <td>
 
-                </tr>
+                                <?php echo htmlspecialchars($value); ?>
 
-                <tr>
+                            </td>
 
-                    <td>Ổ cứng</td>
+                        </tr>
 
-                    <td>SSD 1TB NVMe</td>
+                    <?php endforeach; ?>
 
-                </tr>
+                <?php else: ?>
 
-                <tr>
+                    <tr>
 
-                    <td>Card đồ họa</td>
+                        <td colspan="2">
 
-                    <td>RTX4060 8GB</td>
+                            Chưa có thông số kỹ thuật.
 
-                </tr>
+                        </td>
 
-                <tr>
+                    </tr>
 
-                    <td>Màn hình</td>
-
-                    <td>16 inch 165Hz</td>
-
-                </tr>
+                <?php endif; ?>
 
             </table>
 
@@ -242,9 +360,7 @@ if (!$product) {
 
     </section>
 
-
-
-    <!-- Related -->
+    <!-- Related Products -->
 
     <section class="related-product">
 
@@ -257,24 +373,59 @@ if (!$product) {
             </div>
 
             <div class="product-grid">
+                                <?php if (!empty($relatedProducts)): ?>
 
-                <?php if (!empty($relatedProducts)): ?>
                     <?php foreach ($relatedProducts as $relatedProduct): ?>
+
                         <div class="product-card">
-                            <img src="<?php echo htmlspecialchars(normalizeProductImagePath($relatedProduct['image'] ?? null)); ?>" alt="<?php echo htmlspecialchars($relatedProduct['name']); ?>">
-                            <h4><?php echo htmlspecialchars($relatedProduct['name']); ?></h4>
+
+                            <img
+                                src="<?php echo htmlspecialchars(normalizeProductImagePath($relatedProduct['image'] ?? null)); ?>"
+                                alt="<?php echo htmlspecialchars($relatedProduct['name']); ?>"
+                            >
+
+                            <h4>
+
+                                <?php echo htmlspecialchars($relatedProduct['name']); ?>
+
+                            </h4>
+
                             <div class="price">
+
                                 <span class="new-price">
+
                                     <?php echo number_format((float) $relatedProduct['price'], 0, ',', '.'); ?>₫
+
                                 </span>
+
                             </div>
-                            <a href="product-detail.php?id=<?php echo (int) $relatedProduct['id']; ?>">Xem chi tiết</a>
+
+                            <a
+                                href="product-detail.php?id=<?php echo (int) $relatedProduct['id']; ?>"
+                            >
+                                Xem chi tiết
+                            </a>
+
                         </div>
+
                     <?php endforeach; ?>
+
                 <?php else: ?>
-                    <div style="grid-column: 1 / -1; padding: 20px; background: #f7f7f7; border-radius: 8px;">
+
+                    <div
+                        style="
+                            grid-column: 1 / -1;
+                            padding: 20px;
+                            background: #f7f7f7;
+                            border-radius: 8px;
+                            text-align: center;
+                        "
+                    >
+
                         Chưa có sản phẩm liên quan trong danh mục này.
+
                     </div>
+
                 <?php endif; ?>
 
             </div>
@@ -285,6 +436,34 @@ if (!$product) {
 
 </main>
 
-<?php
-include 'includes/footer.php';
-?>
+<?php include 'includes/footer.php'; ?>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const mainImage = document.getElementById('mainProductImage');
+
+    const thumbs = document.querySelectorAll('.thumb-image');
+
+    thumbs.forEach(function (thumb) {
+
+        thumb.addEventListener('click', function () {
+
+            mainImage.src = this.src;
+
+            thumbs.forEach(function (img) {
+
+                img.classList.remove('active');
+
+            });
+
+            this.classList.add('active');
+
+        });
+
+    });
+
+});
+
+</script>
