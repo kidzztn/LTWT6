@@ -76,9 +76,6 @@ $searchValue = trim($_GET['query'] ?? '');
                 <li><a href="products.php?category=dien-thoai">Điện thoại</a></li>
                 <li><a href="products.php?category=linh-kien-may-tinh">Linh kiện</a></li>
                 <li><a href="products.php?query=gaming">PC Gaming</a></li>
-                <li><a href="products.php?price=under-10">Giá tốt</a></li>
-                <li><a href="products.php?query=apple">Apple</a></li>
-                <li><a href="products.php?price=above-30">Khuyến mãi</a></li>
             </ul>
         </div>
     </nav>

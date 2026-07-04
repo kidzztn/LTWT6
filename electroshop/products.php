@@ -192,14 +192,6 @@ $products = $stmt->fetchAll();
 
                         <a class="active" href="#">1</a>
 
-                        <a href="#">2</a>
-
-                        <a href="#">3</a>
-
-                        <a href="#">4</a>
-
-                        <a href="#">»</a>
-
                     </div>
 
                 </div>
