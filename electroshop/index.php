@@ -380,7 +380,7 @@ $categoryImagesMap = [
 
             <div class="product-grid">
 
-                <?php for($i=1;$i<=8;$i++): ?>
+                <?php for($i=1;$i<=4;$i++): ?>
 
                 <div class="product-card">
 
@@ -462,7 +462,7 @@ $categoryImagesMap = [
 
             <div class="product-grid">
 
-                <?php for($i=1;$i<=8;$i++): ?>
+                <?php for($i=1;$i<=4;$i++): ?>
 
                 <div class="product-card">
 
@@ -553,7 +553,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-mouse"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-mouse"></i> </button>
                     </div>
                 </div>
 
@@ -568,7 +568,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-keyboard"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-keyboard"></i> </button>
                     </div>
                 </div>
 
@@ -583,7 +583,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-keyboard"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-keyboard"></i> </button>
                     </div>
                 </div>
 
@@ -598,7 +598,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-mobile-screen-button"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-mobile-screen-button"></i> </button>
                     </div>
                 </div>
 
@@ -613,7 +613,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-laptop"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-laptop"></i> </button>
                     </div>
                 </div>
 
@@ -628,7 +628,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-laptop"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-laptop"></i> </button>
                     </div>
                 </div>
 
@@ -643,7 +643,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-mobile-screen-button"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-mobile-screen-button"></i></button>
                     </div>
                 </div>
 
@@ -658,7 +658,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-tv"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-tv"></i> </button>
                     </div>
                 </div>
 
@@ -687,18 +687,12 @@ $categoryImagesMap = [
                 <img src="/LTWT6/img/uploads/14.webp" alt="Apple">
 
                 <img src="/LTWT6/img/uploads/15.webp" alt="Asus">
-
-                <img src="/LTWT6/img/uploads/16.webp" alt="Dell">
-
-                <img src="/LTWT6/img/uploads/17.webp" alt="HP">
-
-                <img src="/LTWT6/img/uploads/18.webp" alt="MSI">
+   
+                <img src="/LTWT6/img/uploads/17.webp" alt="HP"> 
 
                 <img src="/LTWT6/img/uploads/19.webp" alt="Acer">
 
                 <img src="/LTWT6/img/uploads/20.webp" alt="Lenovo">
-
-                <img src="/LTWT6/img/uploads/21.webp" alt="Samsung">
 
             </div>
 
@@ -734,7 +728,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-laptop"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-laptop"></i> </button>
                     </div>
                 </div>
 
@@ -748,7 +742,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-laptop"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-laptop"></i> </button>
                     </div>
                 </div>
 
@@ -762,7 +756,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-gamepad"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-gamepad"></i> </button>
                     </div>
                 </div>
 
@@ -776,7 +770,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-laptop-code"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-laptop-code"></i></button>
                     </div>
                 </div>
 
@@ -790,7 +784,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-laptop"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-laptop"></i> </button>
                     </div>
                 </div>
 
@@ -804,7 +798,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-keyboard"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-keyboard"></i> </button>
                     </div>
                 </div>
 
@@ -818,7 +812,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-camera"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-camera"></i> </button>
                     </div>
                 </div>
 
@@ -832,7 +826,7 @@ $categoryImagesMap = [
                     </div>
                     <div class="product-action">
                         <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-gamepad"></i> Chọn máy</button>
+                        <button><i class="fa-solid fa-gamepad"></i> </button>
                     </div>
                 </div>
 
@@ -1040,52 +1034,6 @@ $categoryImagesMap = [
                     ★★★★★
 
                 </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-
-
-
-    <!-- ================= NEWSLETTER ================= -->
-
-    <section class="newsletter">
-
-        <div class="container">
-
-            <div class="newsletter-box">
-
-                <h2>
-
-                    Đăng ký nhận khuyến mãi
-
-                </h2>
-
-                <p>
-
-                    Nhận thông tin giảm giá và sản phẩm mới nhất.
-
-                </p>
-
-                <form>
-
-                    <input
-
-                        type="email"
-
-                        placeholder="Nhập Email của bạn">
-
-                    <button>
-
-                        Đăng ký
-
-                    </button>
-
-                </form>
 
             </div>
 

@@ -58,11 +58,6 @@ $searchValue = trim($_GET['query'] ?? '');
                         </a>
                     <?php endif; ?>
 
-                    <a href="products.php?price=above-30">
-                        <i class="fa-regular fa-heart"></i>
-                        <span>Yêu thích</span>
-                    </a>
-
                     <a href="cart.php" class="cart">
                         <i class="fa-solid fa-cart-shopping"></i>
                         <span>Giỏ hàng</span>
