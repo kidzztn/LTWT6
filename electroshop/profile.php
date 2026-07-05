@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
 <img src="../img/uploads/1.webp" alt="Avatar">
 <h3><?php echo htmlspecialchars($profile['name'] ?? $customer['name']); ?></h3>
 <ul>
+<li><a href="profile.php">Thông tin tài khoản</a></li>
 <li><a href="orders.php">Đơn hàng</a></li>
 <li><a href="logout.php">Đăng xuất</a></li>
 </ul>

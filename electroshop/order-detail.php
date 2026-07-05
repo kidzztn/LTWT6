@@ -88,7 +88,7 @@ if (!$order) {
             </div>
 
             <?php if (!empty($order['payment_note'])): ?>
-                <div class="alert alert-info" style="margin-bottom: 20px;">
+                <div id="payment-info" class="alert alert-info" style="margin-bottom: 20px;">
                     Ghi chu thanh toan: <?php echo htmlspecialchars((string) $order['payment_note']); ?>
                 </div>
             <?php endif; ?>

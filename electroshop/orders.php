@@ -40,6 +40,13 @@ function getPaymentStatusLabel(string $status): string
         default => 'Chua thanh toan',
     };
 }
+
+function shouldShowPayNow(array $order): bool
+{
+    return ($order['payment_method'] ?? 'cash') === 'transfer'
+        && ($order['payment_status'] ?? 'unpaid') === 'unpaid'
+        && ($order['status'] ?? 'pending') === 'pending';
+}
 ?>
 
 <main>
@@ -57,6 +64,7 @@ function getPaymentStatusLabel(string $status): string
                             <th>Trạng thái</th>
                             <th>Thanh toan</th>
                             <th>Ngày đặt</th>
+                            <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -67,6 +75,14 @@ function getPaymentStatusLabel(string $status): string
                                 <td><?php echo htmlspecialchars(getOrderStatusLabel($order['status'])); ?></td>
                                 <td><?php echo htmlspecialchars(getPaymentMethodLabel((string) ($order['payment_method'] ?? 'cash')) . ' - ' . getPaymentStatusLabel((string) ($order['payment_status'] ?? 'unpaid'))); ?></td>
                                 <td><?php echo htmlspecialchars($order['created_at']); ?></td>
+                                <td>
+                                    <div class="order-actions">
+                                        <a class="order-action-link" href="order-detail.php?id=<?php echo (int) $order['id']; ?>">Xem chi tiết</a>
+                                        <?php if (shouldShowPayNow($order)): ?>
+                                            <a class="order-action-link pay-now" href="order-detail.php?id=<?php echo (int) $order['id']; ?>#payment-info">Thanh toán ngay</a>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

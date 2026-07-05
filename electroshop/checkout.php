@@ -96,10 +96,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                     $customerId = (int)$pdo->lastInsertId();
                 }
             } else {
-                // 2) Guest checkout -> tạo customer mới
-                $insCus = $pdo->prepare('INSERT INTO customers (name, email, phone, address, password_hash) VALUES (?, ?, ?, ?, NULL)');
-                $insCus->execute([$name, $email !== '' ? $email : null, $phone, $address]);
-                $customerId = (int)$pdo->lastInsertId();
+                // 2) Guest checkout -> nếu email đã thuộc tài khoản có sẵn thì gắn đơn vào tài khoản đó
+                if ($email !== '') {
+                    $existingCustomerStmt = $pdo->prepare('SELECT id FROM customers WHERE email = ? LIMIT 1');
+                    $existingCustomerStmt->execute([$email]);
+                    $existingCustomerId = (int) ($existingCustomerStmt->fetchColumn() ?: 0);
+
+                    if ($existingCustomerId > 0) {
+                        $customerId = $existingCustomerId;
+
+                        $upd = $pdo->prepare('UPDATE customers SET name = ?, phone = ?, address = ? WHERE id = ?');
+                        $upd->execute([$name, $phone, $address, $customerId]);
+                    }
+                }
+
+                if ($customerId === null) {
+                    $insCus = $pdo->prepare('INSERT INTO customers (name, email, phone, address, password_hash) VALUES (?, ?, ?, ?, NULL)');
+                    $insCus->execute([$name, $email !== '' ? $email : null, $phone, $address]);
+                    $customerId = (int)$pdo->lastInsertId();
+                }
             }
 
             // 3) Chốt an toàn FK trước khi insert order

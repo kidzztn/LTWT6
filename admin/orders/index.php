@@ -29,7 +29,7 @@ $orders = $pdo->query(
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý đơn hàng</title>
-    <link rel="stylesheet" href="../assets/css/admin.css?v=1">
+    <link rel="stylesheet" href="../assets/css/admin.css?v=7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
@@ -53,58 +53,65 @@ $orders = $pdo->query(
             <?php endif; ?>
 
             <div class="table-box">
-                <table>
-                    <tr>
-                        <th>ID</th>
-                        <th>Khách hàng</th>
-                        <th>Tổng tiền</th>
-                        <th>Trạng thái</th>
-                        <th>Thanh toan</th>
-                        <th>Ngày tạo</th>
-                        <th>Hành động</th>
-                    </tr>
-                    <?php foreach ($orders as $order): ?>
+                <?php if (empty($orders)): ?>
+                    <div class="empty-state">
+                        <h3>Chưa có đơn hàng nào</h3>
+                        <p>Khi khách hoàn tất thanh toán/đặt hàng, đơn sẽ hiển thị tại đây.</p>
+                    </div>
+                <?php else: ?>
+                    <table>
                         <tr>
-                            <td>#<?php echo (int) $order['id']; ?></td>
-                            <td><?php echo htmlspecialchars($order['customer_name'] ?? 'Khách vãng lai'); ?></td>
-                            <td><?php echo number_format((float) $order['total'], 0, ',', '.'); ?>đ</td>
-                            <td>
-                                <?php
-                                $statusClass = 'pending';
-                                $statusText = 'Đang xử lý';
-                                if ($order['status'] === 'success') {
-                                    $statusClass = 'success';
-                                    $statusText = 'Đã thanh toán';
-                                } elseif ($order['status'] === 'cancel') {
-                                    $statusClass = 'cancel';
-                                    $statusText = 'Đã hủy';
-                                }
-                                ?>
-                                <span class="status <?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
-                            </td>
-                            <td>
-                                <?php
-                                $paymentMethodText = ($order['payment_method'] ?? 'cash') === 'transfer' ? 'Chuyen khoan' : 'COD';
-                                $paymentStatusText = match ($order['payment_status'] ?? 'unpaid') {
-                                    'paid' => 'Da thanh toan',
-                                    'refunded' => 'Da hoan tien',
-                                    default => 'Chua thanh toan',
-                                };
-                                ?>
-                                <span><?php echo htmlspecialchars($paymentMethodText . ' - ' . $paymentStatusText); ?></span>
-                            </td>
-                            <td><?php echo htmlspecialchars($order['created_at']); ?></td>
-                            <td>
-                                <a href="view.php?id=<?php echo (int) $order['id']; ?>" class="btn-small">Xem</a>
-                                <form method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa đơn hàng này?');">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id" value="<?php echo (int) $order['id']; ?>">
-                                    <button type="submit" class="btn-small danger">Xóa</button>
-                                </form>
-                            </td>
+                            <th>ID</th>
+                            <th>Khách hàng</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Thanh toan</th>
+                            <th>Ngày tạo</th>
+                            <th>Hành động</th>
                         </tr>
-                    <?php endforeach; ?>
-                </table>
+                        <?php foreach ($orders as $order): ?>
+                            <tr>
+                                <td>#<?php echo (int) $order['id']; ?></td>
+                                <td><?php echo htmlspecialchars($order['customer_name'] ?? 'Khách vãng lai'); ?></td>
+                                <td><?php echo number_format((float) $order['total'], 0, ',', '.'); ?>đ</td>
+                                <td>
+                                    <?php
+                                    $statusClass = 'pending';
+                                    $statusText = 'Đang xử lý';
+                                    if ($order['status'] === 'success') {
+                                        $statusClass = 'success';
+                                        $statusText = 'Đã thanh toán';
+                                    } elseif ($order['status'] === 'cancel') {
+                                        $statusClass = 'cancel';
+                                        $statusText = 'Đã hủy';
+                                    }
+                                    ?>
+                                    <span class="status <?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
+                                </td>
+                                <td>
+                                    <?php
+                                    $paymentMethodText = ($order['payment_method'] ?? 'cash') === 'transfer' ? 'Chuyen khoan' : 'COD';
+                                    $paymentStatusText = match ($order['payment_status'] ?? 'unpaid') {
+                                        'paid' => 'Da thanh toan',
+                                        'refunded' => 'Da hoan tien',
+                                        default => 'Chua thanh toan',
+                                    };
+                                    ?>
+                                    <span><?php echo htmlspecialchars($paymentMethodText . ' - ' . $paymentStatusText); ?></span>
+                                </td>
+                                <td><?php echo htmlspecialchars($order['created_at']); ?></td>
+                                <td>
+                                    <a href="view.php?id=<?php echo (int) $order['id']; ?>" class="btn-small">Xem</a>
+                                    <form method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa đơn hàng này?');">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo (int) $order['id']; ?>">
+                                        <button type="submit" class="btn-small danger">Xóa</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
+                <?php endif; ?>
             </div>
         </div>
     </div>

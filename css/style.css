@@ -2488,6 +2488,64 @@ button:hover{
 
 }
 
+.order-actions{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+    align-items:center;
+
+}
+
+.order-action-link{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-width:130px;
+
+    padding:10px 14px;
+
+    border-radius:10px;
+
+    background:var(--secondary);
+
+    color:#fff;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.order-action-link:hover{
+
+    background:#004fa8;
+
+    color:#fff;
+
+}
+
+.order-action-link.pay-now{
+
+    background:var(--primary);
+
+}
+
+.order-action-link.pay-now:hover{
+
+    background:#c40015;
+
+}
+
 .cart-table img{
 
     width:90px;

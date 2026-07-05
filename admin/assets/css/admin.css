@@ -272,6 +272,23 @@ img {
     background: #fafcff;
 }
 
+.empty-state {
+    padding: 36px 20px;
+    text-align: center;
+    color: #64748b;
+}
+
+.empty-state h3 {
+    margin-bottom: 8px;
+    color: #1e293b;
+    font-size: 20px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 14px;
+}
+
 .btn-primary,
 .btn-small {
     display: inline-block;

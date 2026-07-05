@@ -44,11 +44,16 @@ $searchValue = trim($_GET['query'] ?? '');
 
                 <div class="header-action">
                     <?php if (isCustomerLoggedIn()): ?>
-                        <a href="orders.php">
+                        <a href="profile.php" title="Thông tin tài khoản">
                             <i class="fa-regular fa-user"></i>
-                            <span><?php echo htmlspecialchars(getCurrentCustomer()['name']); ?></span>
+                            <span>Tài khoản</span>
                         </a>
-                        <a href="logout.php">
+                        <a href="orders.php" title="Lịch sử đơn hàng">
+                            <i class="fa-solid fa-box-archive"></i>
+                            <span>Đơn hàng</span>
+                        </a>
+                        <a href="logout.php" title="Đăng xuất">
+                            <i class="fa-solid fa-right-from-bracket"></i>
                             <span>Đăng xuất</span>
                         </a>
                     <?php else: ?>
