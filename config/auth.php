@@ -1,9 +1,4 @@
 <?php
-// ===================================================
-// BẢO VỆ TRANG ADMIN - include file này ở đầu mỗi trang
-// cần đăng nhập mới xem được
-// ===================================================
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

@@ -1,6 +1,4 @@
-/*=========================================
-    ELECTROSHOP JAVASCRIPT
-==========================================*/
+
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -9,9 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-/*=========================================
-    HERO SLIDER AUTO
-==========================================*/
+
 
 const heroImages = [
 
@@ -56,9 +52,7 @@ if(heroImage){
 }
 
 
-/*=========================================
-    PRODUCT GALLERY
-==========================================*/
+
 
 const mainImage = document.querySelector(".main-image img");
 
@@ -75,9 +69,7 @@ thumbs.forEach(function(item){
 });
 
 
-/*=========================================
-    COUNTDOWN FLASH SALE
-==========================================*/
+
 
 const countdown = document.querySelector(".countdown");
 
@@ -155,9 +147,7 @@ cards.forEach(function(card){
 });
 
 
-/*=========================================
-    BACK TO TOP BUTTON
-==========================================*/
+
 
 const topButton = document.createElement("button");
 
@@ -224,9 +214,7 @@ topButton.onclick=function(){
 };
 
 
-/*=========================================
-    STICKY HEADER EFFECT
-==========================================*/
+
 
 const header=document.querySelector(".main-header");
 
@@ -251,9 +239,7 @@ window.addEventListener("scroll",function(){
 });
 
 
-/*=========================================
-    BUTTON RIPPLE EFFECT
-==========================================*/
+ 
 
 const buttons=document.querySelectorAll("button");
 
@@ -274,9 +260,7 @@ buttons.forEach(function(btn){
 });
 
 
-/*=========================================
-    IMAGE FADE
-==========================================*/
+ 
 
 const images=document.querySelectorAll("img");
 
@@ -287,9 +271,7 @@ images.forEach(function(img){
 });
 
 
-/*=========================================
-    PRELOADER
-==========================================*/
+ 
 
 window.onload=function(){
 
@@ -308,9 +290,7 @@ window.onload=function(){
     }
 
 }
-/*=========================================================
-    SEARCH BOX
-=========================================================*/
+ 
 
 const searchInput = document.querySelector(".search-box input");
 
@@ -331,9 +311,7 @@ if(searchInput){
 }
 
 
-/*=========================================================
-    PRODUCT IMAGE HOVER
-=========================================================*/
+ 
 
 document.querySelectorAll(".product-card img").forEach(function(img){
 
@@ -352,10 +330,7 @@ document.querySelectorAll(".product-card img").forEach(function(img){
 });
 
 
-/*=========================================================
-    HEADER HIDE / SHOW
-=========================================================*/
-
+ 
 let lastScroll = 0;
 
 const headerBar = document.querySelector(".main-header");
@@ -383,9 +358,7 @@ window.addEventListener("scroll",function(){
 });
 
 
-/*=========================================================
-    ACTIVE MENU
-=========================================================*/
+ 
 
 const menuLinks=document.querySelectorAll(".navbar-menu a");
 
@@ -406,9 +379,7 @@ menuLinks.forEach(function(link){
 });
 
 
-/*=========================================================
-    QUANTITY BUTTON
-=========================================================*/
+ 
 
 const quantityInput=document.querySelector(".quantity input");
 
@@ -427,9 +398,7 @@ if(quantityInput){
 }
 
 
-/*=========================================================
-    FADE UP WHEN SCROLL
-=========================================================*/
+ 
 
 const fadeItems=document.querySelectorAll(
 
@@ -466,9 +435,7 @@ fadeItems.forEach(function(item){
 });
 
 
-/*=========================================================
-    NEWSLETTER
-=========================================================*/
+ 
 
 const newsletter=document.querySelector(".newsletter form");
 
@@ -497,10 +464,7 @@ if(newsletter){
 }
 
 
-/*=========================================================
-    ADD TO CART DEMO
-=========================================================*/
-
+ 
 let cart=0;
 
 const cartBadge=document.querySelector(".cart-count");
@@ -530,9 +494,7 @@ document.querySelectorAll(".product-action button").forEach(function(btn){
 });
 
 
-/*=========================================================
-    BUTTON LOADING
-=========================================================*/
+ 
 
 document.querySelectorAll("button").forEach(function(btn){
 
@@ -561,9 +523,7 @@ document.querySelectorAll("button").forEach(function(btn){
 });
 
 
-/*=========================================================
-    COPYRIGHT YEAR
-=========================================================*/
+ 
 
 const year=document.getElementById("year");
 
@@ -574,9 +534,7 @@ if(year){
 }
 
 
-/*=========================================================
-    CONSOLE
-=========================================================*/
+ 
 
 console.log("%cElectroShop","font-size:28px;color:red;font-weight:bold;");
 

@@ -71,22 +71,7 @@ if (empty($galleryImages) && !empty($product['image'])) {
     $galleryImages[] = $product['image'];
 }
 
-/*
-|--------------------------------------------------------------------------
-| Specifications
-|--------------------------------------------------------------------------
-|
-| specifications lưu JSON:
-|
-| {
-|   "CPU":"Intel Core Ultra 7",
-|   "RAM":"32GB",
-|   "SSD":"1TB",
-|   "GPU":"RTX5070"
-| }
-|
-*/
-
+ 
 $specifications = [];
 
 if (!empty($product['specifications'])) {
@@ -97,11 +82,7 @@ if (!empty($product['specifications'])) {
     }
 }
 
-/*
-|--------------------------------------------------------------------------
-| Related Products
-|--------------------------------------------------------------------------
-*/
+
 
 $relatedStmt = $pdo->prepare("
     SELECT

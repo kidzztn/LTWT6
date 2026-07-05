@@ -1,8 +1,5 @@
 <?php
-// ===================================================
-// KẾT NỐI DATABASE
-// Đổi DB_USER / DB_PASS nếu XAMPP MySQL của bạn có mật khẩu
-// ===================================================
+
 
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'electroshop');

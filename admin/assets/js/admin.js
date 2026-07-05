@@ -1,7 +1,3 @@
-/*=====================================
-    ELECTROSHOP ADMIN
-======================================*/
-
 document.addEventListener("DOMContentLoaded", () => {
 
     console.log("ElectroShop Admin Ready");
