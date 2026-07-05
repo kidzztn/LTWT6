@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    $stmt = $pdo->prepare('SELECT id, name, email, password_hash, password FROM customers WHERE email = ?');
+    $stmt = $pdo->prepare('SELECT id, name, email, password_hash FROM customers WHERE email = ?');
     $stmt->execute([$email]);
     $customer = $stmt->fetch();
 
@@ -23,8 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     if ($customer) {
         $storedHash = $customer['password_hash'] ?? '';
         if ($storedHash !== '' && password_verify($password, $storedHash)) {
-            $isValid = true;
-        } elseif (isset($customer['password']) && $customer['password'] === $password) {
             $isValid = true;
         }
     }

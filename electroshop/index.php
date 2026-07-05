@@ -5,6 +5,64 @@ include 'includes/navbar.php';
 
 $categories = $pdo->query('SELECT id, name, slug FROM categories ORDER BY id')->fetchAll();
 $featuredProducts = $pdo->query('SELECT id, name, slug, price, image FROM products ORDER BY id DESC LIMIT 8')->fetchAll();
+
+$loadProductsByCategory = static function (PDO $pdo, string $categorySlug, int $limit = 4): array {
+    $stmt = $pdo->prepare(
+        'SELECT p.id, p.name, p.slug, p.price, p.image
+         FROM products p
+         INNER JOIN categories c ON c.id = p.category_id
+         WHERE c.slug = ?
+         ORDER BY p.id DESC
+         LIMIT ' . (int) $limit
+    );
+    $stmt->execute([$categorySlug]);
+    return $stmt->fetchAll();
+};
+
+$resolveSectionImage = static function (?string $image, string $fallback): string {
+    $resolved = normalizeProductImagePath($image);
+    if ($resolved === '../img/products/default.svg') {
+        return $fallback;
+    }
+    return $resolved;
+};
+
+$resolveProductTypeIcon = static function (string $productName, string $categorySlug): string {
+    $name = strtolower($productName);
+
+    if ($categorySlug === 'dien-thoai') {
+        return 'fa-mobile-screen-button';
+    }
+    if ($categorySlug === 'laptop') {
+        return 'fa-laptop';
+    }
+
+    if (strpos($name, 'chuot') !== false || strpos($name, 'mouse') !== false) {
+        return 'fa-mouse';
+    }
+    if (strpos($name, 'ban phim') !== false || strpos($name, 'keyboard') !== false) {
+        return 'fa-keyboard';
+    }
+    if (strpos($name, 'tai nghe') !== false || strpos($name, 'headphone') !== false) {
+        return 'fa-headphones';
+    }
+    if (strpos($name, 'man hinh') !== false || strpos($name, 'monitor') !== false) {
+        return 'fa-tv';
+    }
+    if (strpos($name, 'ssd') !== false || strpos($name, 'ram') !== false) {
+        return 'fa-memory';
+    }
+
+    return 'fa-microchip';
+};
+
+$laptopProducts = $loadProductsByCategory($pdo, 'laptop', 4);
+$phoneProducts = $loadProductsByCategory($pdo, 'dien-thoai', 4);
+$gearProducts = $loadProductsByCategory($pdo, 'linh-kien-may-tinh', 4);
+$showLaptopSection = count($laptopProducts) >= 4;
+$showPhoneSection = count($phoneProducts) >= 4;
+$showGearSection = count($gearProducts) >= 4;
+
 $categoryImages = [
     '../img/uploads/4.webp',
     '../img/uploads/5.webp',
@@ -364,8 +422,9 @@ $categoryImagesMap = [
 
     </section>
 
-       <!-- ================= LAPTOP NỔI BẬT ================= -->
+    <!-- ================= LAPTOP NỔI BẬT ================= -->
 
+    <?php if ($showLaptopSection): ?>
     <section class="featured-product">
 
         <div class="container">
@@ -380,55 +439,31 @@ $categoryImagesMap = [
 
             <div class="product-grid">
 
-                <?php for($i=1;$i<=4;$i++): ?>
-
-                <div class="product-card">
-
-                    <span class="discount">-15%</span>
-
-                    <img src="../img/products/laptop.png" alt="">
-
-                    <h4>ASUS TUF Gaming A15 Ryzen 7 RTX 4060</h4>
-
-                    <div class="rating">
-
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-
-                    </div>
-
-                    <div class="price">
-
-                        <span class="new-price">28.990.000₫</span>
-
-                        <span class="old-price">32.990.000₫</span>
-
-                    </div>
-
-                    <div class="product-action">
-
-                        <a href="product-detail.php">Xem chi tiết</a>
-
-                        <button>
-
-                            <i class="fa-solid fa-cart-shopping"></i>
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <?php endfor; ?>
+                <?php foreach ($laptopProducts as $product): ?>
+                        <div class="product-card">
+                            <span class="discount">-10%</span>
+                            <img class="uniform-product-image" src="<?php echo htmlspecialchars($resolveSectionImage($product['image'] ?? null, '../img/uploads/5.webp')); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            <h4><?php echo htmlspecialchars($product['name']); ?></h4>
+                            <div class="rating">★★★★★</div>
+                            <div class="price">
+                                <span class="new-price"><?php echo number_format((float) $product['price'], 0, ',', '.'); ?>₫</span>
+                                <span class="old-price"><?php echo number_format((float) $product['price'] * 1.12, 0, ',', '.'); ?>₫</span>
+                            </div>
+                            <div class="product-action">
+                                <a href="product-detail.php?id=<?php echo (int) $product['id']; ?>">Xem chi tiết</a>
+                                <button type="button" class="icon-btn" aria-label="Loại sản phẩm">
+                                    <i class="fa-solid <?php echo htmlspecialchars($resolveProductTypeIcon($product['name'], 'laptop')); ?>"></i>
+                                </button>
+                            </div>
+                        </div>
+                <?php endforeach; ?>
 
             </div>
 
         </div>
 
     </section>
+    <?php endif; ?>
 
 
 
@@ -448,6 +483,7 @@ $categoryImagesMap = [
 
     <!-- ================= ĐIỆN THOẠI ================= -->
 
+    <?php if ($showPhoneSection): ?>
     <section class="featured-product">
 
         <div class="container">
@@ -462,68 +498,37 @@ $categoryImagesMap = [
 
             <div class="product-grid">
 
-                <?php for($i=1;$i<=4;$i++): ?>
-
-                <div class="product-card">
-
-                    <span class="discount">-8%</span>
-
-                    <img src="../img/products/iphone.png" alt="">
-
-                    <h4>iPhone 16 Pro Max 256GB</h4>
-
-                    <div class="rating">
-
-                        ★★★★★
-
-                    </div>
-
-                    <div class="price">
-
-                        <span class="new-price">
-
-                            30.990.000₫
-
-                        </span>
-
-                        <span class="old-price">
-
-                            33.990.000₫
-
-                        </span>
-
-                    </div>
-
-                    <div class="product-action">
-
-                        <a href="product-detail.php">
-
-                            Xem chi tiết
-
-                        </a>
-
-                        <button>
-
-                            <i class="fa-solid fa-cart-shopping"></i>
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <?php endfor; ?>
+                <?php foreach ($phoneProducts as $product): ?>
+                        <div class="product-card">
+                            <span class="discount">-8%</span>
+                            <img class="uniform-product-image" src="<?php echo htmlspecialchars($resolveSectionImage($product['image'] ?? null, '../img/uploads/1.webp')); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            <h4><?php echo htmlspecialchars($product['name']); ?></h4>
+                            <div class="rating">★★★★★</div>
+                            <div class="price">
+                                <span class="new-price"><?php echo number_format((float) $product['price'], 0, ',', '.'); ?>₫</span>
+                                <span class="old-price"><?php echo number_format((float) $product['price'] * 1.10, 0, ',', '.'); ?>₫</span>
+                            </div>
+                            <div class="product-action">
+                                <a href="product-detail.php?id=<?php echo (int) $product['id']; ?>">Xem chi tiết</a>
+                                <button type="button" class="icon-btn" aria-label="Loại sản phẩm">
+                                    <i class="fa-solid <?php echo htmlspecialchars($resolveProductTypeIcon($product['name'], 'dien-thoai')); ?>"></i>
+                                </button>
+                            </div>
+                        </div>
+                <?php endforeach; ?>
 
             </div>
 
         </div>
 
     </section>
+    <?php endif; ?>
 
 
 
     <!-- ================= GAMING GEAR ================= -->
 
+    <?php if ($showGearSection): ?>
     <section class="featured-product">
 
         <div class="container">
@@ -542,131 +547,31 @@ $categoryImagesMap = [
 
             <div class="product-grid">
 
-                <div class="product-card">
-                    <span class="discount">-25%</span>
-                    <img src="/LTWT6/img/uploads/gaming-mouse-real.jpg" alt="Gaming Mouse">
-                    <h4>Chuột Gaming Razer Viper</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">1.190.000₫</span>
-                        <span class="old-price">1.590.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-mouse"></i> </button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">-25%</span>
-                    <img src="/LTWT6/img/uploads/gaming-keyboard-real.jpg" alt="Gaming Keyboard">
-                    <h4>Bàn phím Gaming Corsair K70</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">2.090.000₫</span>
-                        <span class="old-price">2.790.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-keyboard"></i> </button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">-25%</span>
-                    <img src="/LTWT6/img/uploads/6.webp" alt="Gaming Keyboard">
-                    <h4>Bàn phím RGB HyperX</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">1.890.000₫</span>
-                        <span class="old-price">2.490.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-keyboard"></i> </button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">-25%</span>
-                    <img src="/LTWT6/img/uploads/24.webp" alt="Xiaomi Smartphone">
-                    <h4>Điện thoại Xiaomi 13</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">12.990.000₫</span>
-                        <span class="old-price">16.490.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-mobile-screen-button"></i> </button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">-25%</span>
-                    <img src="/LTWT6/img/uploads/5.webp" alt="MacBook Air">
-                    <h4>MacBook Air 15" M2</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">29.490.000₫</span>
-                        <span class="old-price">32.990.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-laptop"></i> </button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">-25%</span>
-                    <img src="/LTWT6/img/uploads/3.webp" alt="MSI Gaming Laptop">
-                    <h4>MSI Gaming 16GB RTX</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">33.990.000₫</span>
-                        <span class="old-price">39.990.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-laptop"></i> </button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">-25%</span>
-                    <img src="/LTWT6/img/uploads/7.webp" alt="Phone Stand">
-                    <h4>Móc điện thoại đa năng</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">190.000₫</span>
-                        <span class="old-price">250.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-mobile-screen-button"></i></button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">-25%</span>
-                    <img src="/LTWT6/img/uploads/30.webp" alt="Gaming Monitor">
-                    <h4>Màn hình Gaming 27" 144Hz</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">8.490.000₫</span>
-                        <span class="old-price">10.990.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-tv"></i> </button>
-                    </div>
-                </div>
+                <?php foreach ($gearProducts as $product): ?>
+                        <div class="product-card">
+                            <span class="discount">-12%</span>
+                            <img class="uniform-product-image" src="<?php echo htmlspecialchars($resolveSectionImage($product['image'] ?? null, '../img/uploads/6.webp')); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            <h4><?php echo htmlspecialchars($product['name']); ?></h4>
+                            <div class="rating">★★★★★</div>
+                            <div class="price">
+                                <span class="new-price"><?php echo number_format((float) $product['price'], 0, ',', '.'); ?>₫</span>
+                                <span class="old-price"><?php echo number_format((float) $product['price'] * 1.15, 0, ',', '.'); ?>₫</span>
+                            </div>
+                            <div class="product-action">
+                                <a href="product-detail.php?id=<?php echo (int) $product['id']; ?>">Xem chi tiết</a>
+                                <button type="button" class="icon-btn" aria-label="Loại sản phẩm">
+                                    <i class="fa-solid <?php echo htmlspecialchars($resolveProductTypeIcon($product['name'], 'linh-kien-may-tinh')); ?>"></i>
+                                </button>
+                            </div>
+                        </div>
+                <?php endforeach; ?>
 
             </div>
 
         </div>
 
     </section>
+    <?php endif; ?>
 
 
 

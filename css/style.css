@@ -935,6 +935,10 @@ align-items:start;
 
     box-shadow:0 10px 25px rgba(0,0,0,.05);
 
+    display:flex;
+
+    flex-direction:column;
+
 }
 
 .product-card:hover{
@@ -949,9 +953,33 @@ align-items:start;
 
     height:220px;
 
+    width:100%;
+
     object-fit:contain;
 
+    object-position:center;
+
     transition:.45s;
+
+    display:block;
+
+    margin:0 auto;
+
+}
+
+.uniform-product-image{
+
+    height:220px;
+
+    width:100%;
+
+    object-fit:contain;
+
+    object-position:center;
+
+    display:block;
+
+    margin:0 auto;
 
 }
 
@@ -1058,6 +1086,8 @@ align-items:start;
     display:flex;
 
     gap:12px;
+
+    margin-top:auto;
 
 }
 
@@ -1197,7 +1227,7 @@ align-items:start;
 .product-card img{ height:220px; object-fit:contain; display:block; margin:0 auto; }
 
 /* Category / discovery grid images */
-.product-grid img{ height:160px; object-fit:contain; display:block; margin:0 auto; padding:8px; background:transparent; }
+.category .product-grid > a.product-card img{ height:160px; object-fit:contain; display:block; margin:0 auto; padding:8px; background:transparent; }
 
 /* Small banners (right column) ensure full image visible */
 .hero-right .small-banner img{ width:100%; height:100%; object-fit:cover; }
