@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $path = uploadProductImage($singleFile);
 
             if ($path === null) {
-                $errorMessage = 'Tải ảnh thất bại (file ' . htmlspecialchars($singleFile['name']) . ').';
+                $errorMessage = 'Tải ảnh thất bại (file ' . $singleFile['name'] . ').';
                 break;
             }
 

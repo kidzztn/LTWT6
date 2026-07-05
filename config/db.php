@@ -148,11 +148,14 @@ function ensureDatabaseSchema(PDO $pdo): void
         'specifications' => "ALTER TABLE products ADD COLUMN specifications TEXT DEFAULT NULL",
     ];
 
-    foreach ($productAlterColumns as $alterSql) {
+    foreach ($productAlterColumns as $columnName => $alterSql) {
         try {
             $pdo->exec($alterSql);
         } catch (PDOException $e) {
-            if (strpos($e->getMessage(), 'Duplicate column name') === false && strpos($e->getMessage(), 'already exists') === false) {
+            // 42S21 = Duplicate column name (MySQL/MariaDB)
+            if ($e->getCode() !== '42S21' &&
+                strpos($e->getMessage(), 'Duplicate column name') === false &&
+                strpos($e->getMessage(), 'already exists') === false) {
                 throw $e;
             }
         }
