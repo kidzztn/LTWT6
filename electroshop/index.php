@@ -359,7 +359,9 @@ $categoryImagesMap = [
 
                     <span class="discount">-20%</span>
 
-                    <img src="<?php echo htmlspecialchars(normalizeProductImagePath($product['image'] ?? null)); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                    <div class="product-image-box">
+                        <img src="<?php echo htmlspecialchars(normalizeProductImagePath($product['image'] ?? null)); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                    </div>
                     <p class="product-category">Sản phẩm nổi bật</p>
                     <h4><?php echo htmlspecialchars($product['name']); ?></h4>
 
@@ -442,7 +444,9 @@ $categoryImagesMap = [
                 <?php foreach ($laptopProducts as $product): ?>
                         <div class="product-card">
                             <span class="discount">-10%</span>
-                            <img class="uniform-product-image" src="<?php echo htmlspecialchars($resolveSectionImage($product['image'] ?? null, '../img/uploads/5.webp')); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            <div class="product-image-box">
+                                <img class="uniform-product-image" src="<?php echo htmlspecialchars($resolveSectionImage($product['image'] ?? null, '../img/uploads/5.webp')); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            </div>
                             <h4><?php echo htmlspecialchars($product['name']); ?></h4>
                             <div class="rating">★★★★★</div>
                             <div class="price">
@@ -501,7 +505,9 @@ $categoryImagesMap = [
                 <?php foreach ($phoneProducts as $product): ?>
                         <div class="product-card">
                             <span class="discount">-8%</span>
-                            <img class="uniform-product-image" src="<?php echo htmlspecialchars($resolveSectionImage($product['image'] ?? null, '../img/uploads/1.webp')); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            <div class="product-image-box">
+                                <img class="uniform-product-image" src="<?php echo htmlspecialchars($resolveSectionImage($product['image'] ?? null, '../img/uploads/1.webp')); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            </div>
                             <h4><?php echo htmlspecialchars($product['name']); ?></h4>
                             <div class="rating">★★★★★</div>
                             <div class="price">
@@ -550,7 +556,9 @@ $categoryImagesMap = [
                 <?php foreach ($gearProducts as $product): ?>
                         <div class="product-card">
                             <span class="discount">-12%</span>
-                            <img class="uniform-product-image" src="<?php echo htmlspecialchars($resolveSectionImage($product['image'] ?? null, '../img/uploads/6.webp')); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            <div class="product-image-box">
+                                <img class="uniform-product-image" src="<?php echo htmlspecialchars($resolveSectionImage($product['image'] ?? null, '../img/uploads/6.webp')); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            </div>
                             <h4><?php echo htmlspecialchars($product['name']); ?></h4>
                             <div class="rating">★★★★★</div>
                             <div class="price">
@@ -625,7 +633,9 @@ $categoryImagesMap = [
 
                 <div class="product-card">
                     <span class="discount">Best Seller</span>
-                    <img src="/LTWT6/img/uploads/1.webp" alt="MacBook Air M2">
+                    <div class="product-image-box">
+                        <img src="/LTWT6/img/uploads/1.webp" alt="MacBook Air M2">
+                    </div>
                     <h4>MacBook Air M2 16GB 512GB</h4>
                     <div class="rating">★★★★★</div>
                     <div class="price">
@@ -639,7 +649,9 @@ $categoryImagesMap = [
 
                 <div class="product-card">
                     <span class="discount">Best Seller</span>
-                    <img src="/LTWT6/img/uploads/4.webp" alt="LG Gram Book 16">
+                    <div class="product-image-box">
+                        <img src="/LTWT6/img/uploads/4.webp" alt="LG Gram Book 16">
+                    </div>
                     <h4>LG Gram Book 16 16GB 512GB</h4>
                     <div class="rating">★★★★★</div>
                     <div class="price">
@@ -653,7 +665,9 @@ $categoryImagesMap = [
 
                 <div class="product-card">
                     <span class="discount">Best Seller</span>
-                    <img src="/LTWT6/img/uploads/3.webp" alt="MSI Gaming Laptop">
+                    <div class="product-image-box">
+                        <img src="/LTWT6/img/uploads/3.webp" alt="MSI Gaming Laptop">
+                    </div>
                     <h4>MSI Gaming Laptop 16GB RTX</h4>
                     <div class="rating">★★★★★</div>
                     <div class="price">
@@ -667,7 +681,9 @@ $categoryImagesMap = [
 
                 <div class="product-card">
                     <span class="discount">Best Seller</span>
-                    <img src="/LTWT6/img/uploads/2.webp" alt="ASUS Vivobook Flip">
+                    <div class="product-image-box">
+                        <img src="/LTWT6/img/uploads/2.webp" alt="ASUS Vivobook Flip">
+                    </div>
                     <h4>ASUS Vivobook Flip 14" 8GB</h4>
                     <div class="rating">★★★★★</div>
                     <div class="price">
@@ -681,7 +697,9 @@ $categoryImagesMap = [
 
                 <div class="product-card">
                     <span class="discount">Best Seller</span>
-                    <img src="/LTWT6/img/uploads/5.webp" alt="MacBook Air 15">
+                    <div class="product-image-box">
+                        <img src="/LTWT6/img/uploads/5.webp" alt="MacBook Air 15">
+                    </div>
                     <h4>MacBook Air 15" 8GB 256GB</h4>
                     <div class="rating">★★★★★</div>
                     <div class="price">
@@ -695,7 +713,9 @@ $categoryImagesMap = [
 
                 <div class="product-card">
                     <span class="discount">Best Seller</span>
-                    <img src="/LTWT6/img/uploads/6.webp" alt="Gaming Keyboard">
+                    <div class="product-image-box">
+                        <img src="/LTWT6/img/uploads/6.webp" alt="Gaming Keyboard">
+                    </div>
                     <h4>Razer Gaming Keyboard</h4>
                     <div class="rating">★★★★★</div>
                     <div class="price">
@@ -709,7 +729,9 @@ $categoryImagesMap = [
 
                 <div class="product-card">
                     <span class="discount">Best Seller</span>
-                    <img src="/LTWT6/img/uploads/8.webp" alt="Camera Lens">
+                    <div class="product-image-box">
+                        <img src="/LTWT6/img/uploads/8.webp" alt="Camera Lens">
+                    </div>
                     <h4>Lens Máy Ảnh 50mm</h4>
                     <div class="rating">★★★★★</div>
                     <div class="price">
@@ -723,7 +745,9 @@ $categoryImagesMap = [
 
                 <div class="product-card">
                     <span class="discount">Best Seller</span>
-                    <img src="/LTWT6/img/uploads/9.webp" alt="PS5 Controller">
+                    <div class="product-image-box">
+                        <img src="/LTWT6/img/uploads/9.webp" alt="PS5 Controller">
+                    </div>
                     <h4>Tay cầm PS5 DualSense</h4>
                     <div class="rating">★★★★★</div>
                     <div class="price">
