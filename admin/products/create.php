@@ -31,17 +31,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $weight      = trim($_POST['weight'] ?? '');
     $warranty    = trim($_POST['warranty'] ?? '');
 
-    $imagePath = null;
+    $imagePath  = null;
+    $imagesJson = null;
 
-    if (
-        isset($_FILES['image']) &&
-        $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE
-    ) {
+    if (isset($_FILES['images']) && is_array($_FILES['images']['error'])) {
 
-        $imagePath = uploadProductImage($_FILES['image']);
+        $uploadedPaths = [];
 
-        if ($imagePath === null) {
-            $errorMessage = 'Tải ảnh thất bại.';
+        foreach ($_FILES['images']['error'] as $idx => $error) {
+
+            if ($error === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+
+            $singleFile = [
+                'name'     => $_FILES['images']['name'][$idx],
+                'type'     => $_FILES['images']['type'][$idx],
+                'tmp_name' => $_FILES['images']['tmp_name'][$idx],
+                'error'    => $_FILES['images']['error'][$idx],
+                'size'     => $_FILES['images']['size'][$idx],
+            ];
+
+            $path = uploadProductImage($singleFile);
+
+            if ($path === null) {
+                $errorMessage = 'Tải ảnh thất bại (file ' . htmlspecialchars($singleFile['name']) . ').';
+                break;
+            }
+
+            $uploadedPaths[] = $path;
+        }
+
+        if ($errorMessage === '' && !empty($uploadedPaths)) {
+            $imagePath  = $uploadedPaths[0];
+            $imagesJson = json_encode($uploadedPaths, JSON_UNESCAPED_UNICODE);
         }
 
     }
@@ -54,6 +77,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($errorMessage === '') {
 
+        $specData = array_filter([
+            'CPU'           => $cpu,
+            'RAM'           => $ram,
+            'Ổ cứng'        => $storage,
+            'Card đồ họa'   => $gpu,
+            'Màn hình'      => $display,
+            'Pin'           => $battery,
+            'Hệ điều hành'  => $os,
+            'Trọng lượng'   => $weight,
+            'Bảo hành'      => $warranty,
+        ]);
+
+        $specificationsJson = !empty($specData)
+            ? json_encode($specData, JSON_UNESCAPED_UNICODE)
+            : null;
+
         $stmt = $pdo->prepare("
             INSERT INTO products
             (
@@ -64,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 stock,
                 description,
                 image,
+                images,
                 cpu,
                 ram,
                 storage,
@@ -72,11 +112,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 battery,
                 os,
                 weight,
-                warranty
+                warranty,
+                specifications
             )
             VALUES
             (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
         ");
 
@@ -88,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stock,
             $description,
             $imagePath,
+            $imagesJson,
             $cpu,
             $ram,
             $storage,
@@ -96,7 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $battery,
             $os,
             $weight,
-            $warranty
+            $warranty,
+            $specificationsJson,
         ]);
 
         header("Location: index.php");
@@ -234,13 +277,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="form-group">
-                        <label>Ảnh sản phẩm</label>
+                        <label>Ảnh sản phẩm (có thể chọn nhiều ảnh)</label>
 
                         <input
                             type="file"
-                            name="image"
+                            name="images[]"
                             accept="image/*"
+                            multiple
                         >
+
+                        <small style="color:#666;">Ảnh đầu tiên sẽ là ảnh đại diện chính.</small>
                     </div>
 
                     <div class="form-group">
@@ -308,6 +354,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 type="text"
                                 name="display"
                                 placeholder="15.6 inch FHD 144Hz"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pin</label>
+                            <input
+                                type="text"
+                                name="battery"
+                                placeholder="72Wh"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Hệ điều hành</label>
+                            <input
+                                type="text"
+                                name="os"
+                                placeholder="Windows 11 Home"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Trọng lượng</label>
+                            <input
+                                type="text"
+                                name="weight"
+                                placeholder="2.2 kg"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Bảo hành</label>
+                            <input
+                                type="text"
+                                name="warranty"
+                                placeholder="24 tháng"
                             >
                         </div>
 
