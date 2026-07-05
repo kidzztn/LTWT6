@@ -64,6 +64,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
         $paymentMethod = 'cash';
     }
 
+    logCustomerActivity($pdo, [
+        'customer_id' => $loggedCustomerId > 0 ? $loggedCustomerId : null,
+        'customer_name' => $name !== '' ? $name : ($loggedCustomer['name'] ?? null),
+        'customer_email' => $email !== '' ? $email : ($loggedCustomer['email'] ?? null),
+        'action_type' => 'checkout_attempt',
+        'action_label' => 'Khách hàng bắt đầu đặt hàng',
+        'action_details' => 'Phương thức thanh toán: ' . ($paymentMethod === 'transfer' ? 'Chuyển khoản' : 'COD') . '; Tổng tạm tính: ' . number_format((float) $total, 0, ',', '.') . 'đ',
+    ]);
+
     if ($name === '' || $phone === '' || $address === '') {
         $errorMessage = 'Vui lòng nhập đầy đủ họ tên, số điện thoại và địa chỉ.';
     } elseif (empty($cartItems)) {
@@ -168,6 +177,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
             $successMessage = 'Đặt hàng thành công. Mã đơn hàng #' . $orderId;
 
+            logCustomerActivity($pdo, [
+                'customer_id' => $customerId,
+                'customer_name' => $name,
+                'customer_email' => $email !== '' ? $email : null,
+                'action_type' => 'order_created',
+                'action_label' => 'Khách hàng đặt hàng thành công',
+                'action_details' => 'Đơn #' . $orderId . ' - ' . ($paymentMethod === 'transfer' ? 'Chuyển khoản' : 'COD') . ' - ' . number_format((float) $total, 0, ',', '.') . 'đ',
+                'reference_id' => $orderId,
+            ]);
+
             if ($paymentMethod === 'transfer') {
                 $transferCode = 'ES' . date('Ymd') . '-' . $orderId;
                 $latestTransferInfo = [
@@ -186,6 +205,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
             // Log kỹ thuật để debug
             error_log('[CHECKOUT_ERROR] ' . $e->getMessage());
+
+            logCustomerActivity($pdo, [
+                'customer_id' => $loggedCustomerId > 0 ? $loggedCustomerId : null,
+                'customer_name' => $name !== '' ? $name : ($loggedCustomer['name'] ?? null),
+                'customer_email' => $email !== '' ? $email : ($loggedCustomer['email'] ?? null),
+                'action_type' => 'checkout_failed',
+                'action_label' => 'Khách hàng đặt hàng thất bại',
+                'action_details' => $e->getMessage(),
+            ]);
 
             // Thông báo thân thiện cho user
             $errorMessage = 'Đặt hàng thất bại: ' . $e->getMessage();

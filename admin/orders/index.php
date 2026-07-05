@@ -22,6 +22,14 @@ $orders = $pdo->query(
      LEFT JOIN customers c ON c.id = o.customer_id
      ORDER BY o.id DESC"
 )->fetchAll();
+
+$recentActivities = $pdo->query(
+    "SELECT customer_name, customer_email, action_type, action_label, action_details, reference_id, created_at
+     FROM customer_activity_logs
+     WHERE action_type IN ('checkout_attempt', 'order_created', 'checkout_failed')
+     ORDER BY id DESC
+     LIMIT 12"
+)->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -51,6 +59,50 @@ $orders = $pdo->query(
             <?php if (!empty($errorMessage)): ?>
                 <div class="alert error"><?php echo htmlspecialchars($errorMessage); ?></div>
             <?php endif; ?>
+
+            <div class="table-box" style="margin-bottom: 20px;">
+                <h3>Hoạt động đặt hàng gần đây</h3>
+                <?php if (empty($recentActivities)): ?>
+                    <div class="empty-state">
+                        <h3>Chưa có hoạt động đặt hàng nào</h3>
+                        <p>Khi khách thao tác thanh toán hoặc đặt đơn, lịch sử sẽ hiển thị tại đây ngay.</p>
+                    </div>
+                <?php else: ?>
+                    <table>
+                        <tr>
+                            <th>Thời gian</th>
+                            <th>Khách hàng</th>
+                            <th>Email</th>
+                            <th>Hoạt động</th>
+                            <th>Chi tiết</th>
+                        </tr>
+                        <?php foreach ($recentActivities as $activity): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($activity['created_at']); ?></td>
+                                <td><?php echo htmlspecialchars($activity['customer_name'] ?: 'Khách chưa rõ tên'); ?></td>
+                                <td><?php echo htmlspecialchars($activity['customer_email'] ?: '-'); ?></td>
+                                <td>
+                                    <?php if (($activity['action_type'] ?? '') === 'order_created'): ?>
+                                        <span class="status success"><?php echo htmlspecialchars($activity['action_label']); ?></span>
+                                    <?php elseif (($activity['action_type'] ?? '') === 'checkout_failed'): ?>
+                                        <span class="status cancel"><?php echo htmlspecialchars($activity['action_label']); ?></span>
+                                    <?php else: ?>
+                                        <span class="status pending"><?php echo htmlspecialchars($activity['action_label']); ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php echo htmlspecialchars($activity['action_details'] ?: '-'); ?>
+                                    <?php if (!empty($activity['reference_id'])): ?>
+                                        <div style="margin-top: 6px;">
+                                            <a href="view.php?id=<?php echo (int) $activity['reference_id']; ?>" class="btn-small">Xem đơn #<?php echo (int) $activity['reference_id']; ?></a>
+                                        </div>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
+                <?php endif; ?>
+            </div>
 
             <div class="table-box">
                 <?php if (empty($orders)): ?>

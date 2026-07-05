@@ -1,10 +1,10 @@
 <?php
 
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'electroshop');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_HOST', getenv('LTWT6_DB_HOST') ?: 'localhost');
+define('DB_NAME', getenv('LTWT6_DB_NAME') ?: 'electroshop');
+define('DB_USER', getenv('LTWT6_DB_USER') ?: 'root');
+define('DB_PASS', getenv('LTWT6_DB_PASS') !== false ? getenv('LTWT6_DB_PASS') : '');
 
 function getPdo(): PDO
 {
@@ -83,6 +83,27 @@ function ensureProductImages(PDO $pdo): void
     foreach ($seedImages as $seedImage) {
         $stmt = $pdo->prepare('UPDATE products SET image = ? WHERE LOWER(name) = LOWER(?)');
         $stmt->execute([$seedImage['image'], $seedImage['name']]);
+    }
+}
+
+function logCustomerActivity(PDO $pdo, array $payload): void
+{
+    try {
+        $stmt = $pdo->prepare(
+            'INSERT INTO customer_activity_logs (customer_id, customer_name, customer_email, action_type, action_label, action_details, reference_id)
+             VALUES (?, ?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->execute([
+            isset($payload['customer_id']) ? (int) $payload['customer_id'] : null,
+            $payload['customer_name'] ?? null,
+            $payload['customer_email'] ?? null,
+            $payload['action_type'] ?? 'unknown',
+            $payload['action_label'] ?? 'Không rõ thao tác',
+            $payload['action_details'] ?? null,
+            isset($payload['reference_id']) ? (int) $payload['reference_id'] : null,
+        ]);
+    } catch (Throwable $e) {
+        error_log('[CUSTOMER_ACTIVITY_LOG_ERROR] ' . $e->getMessage());
     }
 }
 
@@ -246,6 +267,23 @@ function ensureDatabaseSchema(PDO $pdo): void
             INDEX idx_product_created (product_id, created_at),
             CONSTRAINT fk_product_reviews_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
             CONSTRAINT fk_product_reviews_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+
+    $pdo->exec(" 
+        CREATE TABLE IF NOT EXISTS customer_activity_logs (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            customer_id INT DEFAULT NULL,
+            customer_name VARCHAR(100) DEFAULT NULL,
+            customer_email VARCHAR(150) DEFAULT NULL,
+            action_type VARCHAR(50) NOT NULL,
+            action_label VARCHAR(150) NOT NULL,
+            action_details TEXT DEFAULT NULL,
+            reference_id INT DEFAULT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_customer_activity_created (created_at),
+            INDEX idx_customer_activity_type (action_type),
+            CONSTRAINT fk_customer_activity_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
 
