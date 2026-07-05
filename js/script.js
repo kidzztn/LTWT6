@@ -4,6 +4,134 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("ElectroShop Ready!");
 
+    const toastElement = document.querySelector("#appToast");
+    const cartCountElement = document.querySelector(".cart-count");
+    const addToCartButtons = document.querySelectorAll(".add-to-cart-btn[data-product-id]");
+    const copyTransferButtons = document.querySelectorAll(".copy-transfer-btn[data-copy-text]");
+    const transferBox = document.querySelector("[data-transfer-focus='1']");
+
+    function showToast(message, type) {
+        if (!toastElement || !message) {
+            return;
+        }
+
+        toastElement.textContent = message;
+        toastElement.classList.remove("is-visible", "is-success", "is-error");
+        toastElement.classList.add(type === "error" ? "is-error" : "is-success");
+
+        window.clearTimeout(showToast.hideTimer);
+        requestAnimationFrame(function () {
+            toastElement.classList.add("is-visible");
+        });
+
+        showToast.hideTimer = window.setTimeout(function () {
+            toastElement.classList.remove("is-visible");
+        }, 2200);
+    }
+
+    if (transferBox) {
+        setTimeout(function () {
+            transferBox.scrollIntoView({ behavior: "smooth", block: "center" });
+            transferBox.focus({ preventScroll: true });
+        }, 250);
+    }
+
+    addToCartButtons.forEach(function (button) {
+        button.addEventListener("click", async function (event) {
+            event.preventDefault();
+
+            const productId = Number(button.dataset.productId || 0);
+            if (productId <= 0 || button.dataset.loading === "1") {
+                return;
+            }
+
+            const originalContent = button.innerHTML;
+            button.dataset.loading = "1";
+            button.classList.add("is-loading");
+            button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+            try {
+                const response = await fetch("cart-api.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: new URLSearchParams({
+                        product_id: String(productId),
+                        quantity: "1"
+                    })
+                });
+
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || "Không thể thêm sản phẩm vào giỏ hàng.");
+                }
+
+                if (cartCountElement) {
+                    cartCountElement.textContent = String(result.cartCount || 0);
+                    cartCountElement.classList.remove("cart-count-bump");
+                    void cartCountElement.offsetWidth;
+                    cartCountElement.classList.add("cart-count-bump");
+                }
+
+                showToast(result.message || "Đã thêm vào giỏ hàng.", "success");
+
+                button.classList.add("is-added");
+                button.innerHTML = '<i class="fa-solid fa-check"></i>';
+                setTimeout(function () {
+                    button.classList.remove("is-added");
+                    button.innerHTML = originalContent;
+                }, 900);
+            } catch (error) {
+                button.classList.add("is-error");
+                button.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                showToast(error.message || "Không thể thêm vào giỏ hàng.", "error");
+                setTimeout(function () {
+                    button.classList.remove("is-error");
+                    button.innerHTML = originalContent;
+                }, 1200);
+            } finally {
+                delete button.dataset.loading;
+                button.classList.remove("is-loading");
+            }
+        });
+    });
+
+    copyTransferButtons.forEach(function (button) {
+        button.addEventListener("click", async function () {
+            const copyText = button.dataset.copyText || "";
+            if (!copyText) {
+                return;
+            }
+
+            const originalLabel = button.textContent;
+
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(copyText);
+                } else {
+                    const tempInput = document.createElement("textarea");
+                    tempInput.value = copyText;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand("copy");
+                    tempInput.remove();
+                }
+
+                button.textContent = "Đã sao chép";
+                showToast("Đã sao chép nội dung chuyển khoản.", "success");
+            } catch (error) {
+                button.textContent = "Không sao chép được";
+                showToast("Không thể sao chép nội dung chuyển khoản.", "error");
+            }
+
+            setTimeout(function () {
+                button.textContent = originalLabel;
+            }, 1400);
+        });
+    });
+
 });
 
 
@@ -18,36 +146,6 @@ const heroImages = [
     "/LTWT6/img/uploads/3.webp",
 
     "/LTWT6/img/uploads/4.webp"
-
-];
-
-let heroIndex = 0;
-
-const heroImage = document.querySelector(".hero-slider img");
-
-if(heroImage){
-
-    setInterval(function(){
-
-        heroIndex++;
-
-        if(heroIndex >= heroImages.length){
-
-            heroIndex = 0;
-
-        }
-
-        heroImage.style.opacity = 0;
-
-        setTimeout(function(){
-
-            heroImage.src = heroImages[heroIndex];
-
-            heroImage.style.opacity = 1;
-
-        },300);
-
-    },4000);
 
 }
 

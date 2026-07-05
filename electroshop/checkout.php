@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/services.php';
 require_once __DIR__ . '/includes/cart-functions.php';
 require_once __DIR__ . '/includes/customer-auth.php';
 include 'includes/header.php';
@@ -7,9 +8,9 @@ include 'includes/navbar.php';
 
 function buildVietQrUrl(float $amount, string $addInfo): string
 {
-    $bankBin = '970422';
-    $accountNo = '19037049999999';
-    $accountName = 'ELECTROSHOP';
+    $bankBin = '970403';
+    $accountNo = '040107386140';
+    $accountName = '';
 
     return 'https://img.vietqr.io/image/'
         . $bankBin . '-' . $accountNo . '-compact2.png'
@@ -39,6 +40,7 @@ $errorMessage   = '';
 $loggedCustomer = getCurrentCustomer();
 $customerProfile = null;
 $latestTransferInfo = null;
+$latestMomoInfo = null;
 
 $loggedCustomerId = isset($loggedCustomer['id']) ? (int)$loggedCustomer['id'] : 0;
 
@@ -60,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     $paymentMethod = $_POST['payment_method'] ?? 'cash';
     $note = trim($_POST['note'] ?? '');
 
-    if (!in_array($paymentMethod, ['cash', 'transfer'], true)) {
+    if (!in_array($paymentMethod, ['cash', 'transfer', 'momo'], true)) {
         $paymentMethod = 'cash';
     }
 
@@ -70,7 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
         'customer_email' => $email !== '' ? $email : ($loggedCustomer['email'] ?? null),
         'action_type' => 'checkout_attempt',
         'action_label' => 'Khách hàng bắt đầu đặt hàng',
-        'action_details' => 'Phương thức thanh toán: ' . ($paymentMethod === 'transfer' ? 'Chuyển khoản' : 'COD') . '; Tổng tạm tính: ' . number_format((float) $total, 0, ',', '.') . 'đ',
+        'action_details' => 'Phương thức thanh toán: ' . match ($paymentMethod) {
+            'transfer' => 'Chuyển khoản',
+            'momo' => 'MoMo',
+            default => 'COD',
+        } . '; Tổng tạm tính: ' . number_format((float) $total, 0, ',', '.') . 'đ',
     ]);
 
     if ($name === '' || $phone === '' || $address === '') {
@@ -138,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             }
 
             // 4) Tạo order
-            $paymentStatus = $paymentMethod === 'transfer' ? 'unpaid' : 'unpaid';
+            $paymentStatus = 'unpaid';
             $insOrder = $pdo->prepare('INSERT INTO orders (customer_id, total, status, payment_method, payment_status, payment_note) VALUES (?, ?, "pending", ?, ?, ?)');
             $insOrder->execute([$customerId, (float)$total, $paymentMethod, $paymentStatus, $note !== '' ? $note : null]);
             $orderId = (int)$pdo->lastInsertId();
@@ -172,6 +178,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                 ]);
             }
 
+            if ($paymentMethod === 'momo') {
+                if (!isMomoConfigured()) {
+                    throw new RuntimeException('MoMo chưa được cấu hình Partner Code / Access Key / Secret Key.');
+                }
+
+                $momoResponse = createMomoPayment($orderId, (float) $total);
+                $gatewayReference = (string) ($momoResponse['orderId'] ?? '');
+                $gatewayPayload = json_encode($momoResponse, JSON_UNESCAPED_UNICODE);
+                $gatewayUpdateStmt = $pdo->prepare('UPDATE orders SET payment_gateway_reference = ?, payment_gateway_payload = ? WHERE id = ?');
+                $gatewayUpdateStmt->execute([$gatewayReference !== '' ? $gatewayReference : null, $gatewayPayload, $orderId]);
+
+                $latestMomoInfo = [
+                    'pay_url' => (string) ($momoResponse['payUrl'] ?? ''),
+                    'deeplink' => (string) ($momoResponse['deeplink'] ?? ''),
+                    'qr_code_url' => (string) ($momoResponse['qrCodeUrl'] ?? ''),
+                ];
+            }
+
             $pdo->commit();
             clearCart();
 
@@ -183,7 +207,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                 'customer_email' => $email !== '' ? $email : null,
                 'action_type' => 'order_created',
                 'action_label' => 'Khách hàng đặt hàng thành công',
-                'action_details' => 'Đơn #' . $orderId . ' - ' . ($paymentMethod === 'transfer' ? 'Chuyển khoản' : 'COD') . ' - ' . number_format((float) $total, 0, ',', '.') . 'đ',
+                'action_details' => 'Đơn #' . $orderId . ' - ' . match ($paymentMethod) {
+                    'transfer' => 'Chuyển khoản',
+                    'momo' => 'MoMo',
+                    default => 'COD',
+                } . ' - ' . number_format((float) $total, 0, ',', '.') . 'đ',
                 'reference_id' => $orderId,
             ]);
 
@@ -193,9 +221,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                     'code' => $transferCode,
                     'amount' => (float) $total,
                     'qr_url' => buildVietQrUrl((float) $total, $transferCode),
-                    'bank_name' => 'MB Bank',
-                    'account_no' => '19037049999999',
-                    'account_name' => 'ELECTROSHOP',
+                    'bank_name' => 'Sacombank',
+                    'account_no' => '040107386140',
+                    'account_name' => 'TRAN TIN LOC',
                 ];
             }
         } catch (Throwable $e) {
@@ -231,20 +259,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
                     <?php if (!empty($successMessage)): ?>
                         <div class="alert alert-success"><?php echo htmlspecialchars($successMessage); ?></div>
-
-                        <?php if ($latestTransferInfo): ?>
-                            <div class="alert alert-info" style="margin-top: 12px;">
-                                <p><strong>Thong tin chuyen khoan:</strong></p>
-                                <p>Ngan hang: <?php echo htmlspecialchars($latestTransferInfo['bank_name']); ?></p>
-                                <p>So tai khoan: <?php echo htmlspecialchars($latestTransferInfo['account_no']); ?></p>
-                                <p>Chu tai khoan: <?php echo htmlspecialchars($latestTransferInfo['account_name']); ?></p>
-                                <p>So tien: <?php echo number_format((float) $latestTransferInfo['amount'], 0, ',', '.'); ?> VND</p>
-                                <p>Noi dung CK: <strong><?php echo htmlspecialchars($latestTransferInfo['code']); ?></strong></p>
-                                <div style="margin-top: 10px;">
-                                    <img src="<?php echo htmlspecialchars($latestTransferInfo['qr_url']); ?>" alt="VietQR" style="max-width: 220px; border: 1px solid #eee; border-radius: 8px;">
-                                </div>
-                            </div>
-                        <?php endif; ?>
                     <?php endif; ?>
 
                     <?php if (!empty($errorMessage)): ?>
@@ -269,6 +283,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                         <select name="payment_method">
                             <option value="cash">Thanh toán khi nhận hàng</option>
                             <option value="transfer">Chuyển khoản</option>
+                            <option value="momo">Ví MoMo</option>
                         </select>
 
                         <textarea name="note" placeholder="Ghi chú"></textarea>
@@ -286,6 +301,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                     <?php endforeach; ?>
                     <hr>
                     <h3>Tổng <?php echo number_format($total, 0, ',', '.'); ?>₫</h3>
+
+                    <?php if ($latestTransferInfo): ?>
+                        <div class="transfer-box" id="transferBox" tabindex="-1" data-transfer-focus="1">
+                            <h3>Quét mã QR thanh toán</h3>
+                            <p><strong>Ngân hàng:</strong> <?php echo htmlspecialchars($latestTransferInfo['bank_name']); ?></p>
+                            <p><strong>Số tài khoản:</strong> <?php echo htmlspecialchars($latestTransferInfo['account_no']); ?></p>
+                            <p><strong>Chủ tài khoản:</strong> <?php echo htmlspecialchars($latestTransferInfo['account_name']); ?></p>
+                            <p><strong>Số tiền:</strong> <?php echo number_format((float) $latestTransferInfo['amount'], 0, ',', '.'); ?>₫</p>
+                            <div class="transfer-code-row">
+                                <p><strong>Nội dung CK:</strong> <span class="transfer-code-text"><?php echo htmlspecialchars($latestTransferInfo['code']); ?></span></p>
+                                <button type="button" class="copy-transfer-btn" data-copy-text="<?php echo htmlspecialchars($latestTransferInfo['code']); ?>">Sao chép nội dung chuyển khoản</button>
+                            </div>
+                            <div class="transfer-qr-wrap">
+                                <img src="<?php echo htmlspecialchars($latestTransferInfo['qr_url']); ?>" alt="VietQR" class="transfer-qr-image">
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ($latestMomoInfo): ?>
+                        <div class="transfer-box" id="momoBox" tabindex="-1" data-transfer-focus="1">
+                            <h3>Thanh toán MoMo</h3>
+                            <p>Quét mã hoặc mở ứng dụng MoMo để hoàn tất thanh toán.</p>
+                            <?php if ($latestMomoInfo['pay_url'] !== ''): ?>
+                                <a class="copy-transfer-btn" href="<?php echo htmlspecialchars($latestMomoInfo['pay_url']); ?>" target="_blank" rel="noopener noreferrer">Mở trang thanh toán MoMo</a>
+                            <?php endif; ?>
+                            <?php if ($latestMomoInfo['deeplink'] !== ''): ?>
+                                <div style="margin-top: 12px;">
+                                    <a class="copy-transfer-btn" href="<?php echo htmlspecialchars($latestMomoInfo['deeplink']); ?>">Mở ứng dụng MoMo</a>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($latestMomoInfo['qr_code_url'] !== ''): ?>
+                                <div class="transfer-qr-wrap">
+                                    <img src="<?php echo htmlspecialchars($latestMomoInfo['qr_code_url']); ?>" alt="QR MoMo" class="transfer-qr-image">
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

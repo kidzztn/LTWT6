@@ -5,6 +5,7 @@ include 'includes/navbar.php';
 
 $categories = $pdo->query('SELECT id, name, slug FROM categories ORDER BY id')->fetchAll();
 $featuredProducts = $pdo->query('SELECT id, name, slug, price, image FROM products ORDER BY id DESC LIMIT 8')->fetchAll();
+$bestSellerProducts = $pdo->query('SELECT id, name, slug, price, image FROM products ORDER BY stock DESC, id DESC LIMIT 8')->fetchAll();
 
 $loadProductsByCategory = static function (PDO $pdo, string $categorySlug, int $limit = 4): array {
     $stmt = $pdo->prepare(
@@ -394,11 +395,11 @@ $categoryImagesMap = [
 
                         </a>
 
-                        <a href="cart.php" class="icon-btn" type="button">
+                        <button type="button" class="icon-btn add-to-cart-btn" data-product-id="<?php echo (int) $product['id']; ?>" aria-label="Thêm vào giỏ hàng">
 
                             <i class="fa-solid fa-cart-shopping"></i>
 
-                        </a>
+                        </button>
 
                     </div>
 
@@ -455,7 +456,7 @@ $categoryImagesMap = [
                             </div>
                             <div class="product-action">
                                 <a href="product-detail.php?id=<?php echo (int) $product['id']; ?>">Xem chi tiết</a>
-                                <button type="button" class="icon-btn" aria-label="Loại sản phẩm">
+                                <button type="button" class="icon-btn add-to-cart-btn" data-product-id="<?php echo (int) $product['id']; ?>" aria-label="Thêm vào giỏ hàng">
                                     <i class="fa-solid <?php echo htmlspecialchars($resolveProductTypeIcon($product['name'], 'laptop')); ?>"></i>
                                 </button>
                             </div>
@@ -516,7 +517,7 @@ $categoryImagesMap = [
                             </div>
                             <div class="product-action">
                                 <a href="product-detail.php?id=<?php echo (int) $product['id']; ?>">Xem chi tiết</a>
-                                <button type="button" class="icon-btn" aria-label="Loại sản phẩm">
+                                <button type="button" class="icon-btn add-to-cart-btn" data-product-id="<?php echo (int) $product['id']; ?>" aria-label="Thêm vào giỏ hàng">
                                     <i class="fa-solid <?php echo htmlspecialchars($resolveProductTypeIcon($product['name'], 'dien-thoai')); ?>"></i>
                                 </button>
                             </div>
@@ -567,7 +568,7 @@ $categoryImagesMap = [
                             </div>
                             <div class="product-action">
                                 <a href="product-detail.php?id=<?php echo (int) $product['id']; ?>">Xem chi tiết</a>
-                                <button type="button" class="icon-btn" aria-label="Loại sản phẩm">
+                                <button type="button" class="icon-btn add-to-cart-btn" data-product-id="<?php echo (int) $product['id']; ?>" aria-label="Thêm vào giỏ hàng">
                                     <i class="fa-solid <?php echo htmlspecialchars($resolveProductTypeIcon($product['name'], 'linh-kien-may-tinh')); ?>"></i>
                                 </button>
                             </div>
@@ -630,134 +631,25 @@ $categoryImagesMap = [
             </div>
 
             <div class="product-grid">
-
-                <div class="product-card">
-                    <span class="discount">Best Seller</span>
-                    <div class="product-image-box">
-                        <img src="/LTWT6/img/uploads/1.webp" alt="MacBook Air M2">
+                <?php foreach ($bestSellerProducts as $product): ?>
+                    <div class="product-card">
+                        <span class="discount">Best Seller</span>
+                        <div class="product-image-box">
+                            <img src="<?php echo htmlspecialchars(normalizeProductImagePath($product['image'] ?? null)); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                        </div>
+                        <h4><?php echo htmlspecialchars($product['name']); ?></h4>
+                        <div class="rating">★★★★★</div>
+                        <div class="price">
+                            <span class="new-price"><?php echo number_format((float) $product['price'], 0, ',', '.'); ?>₫</span>
+                        </div>
+                        <div class="product-action">
+                            <a href="product-detail.php?id=<?php echo (int) $product['id']; ?>">Xem chi tiết</a>
+                            <button type="button" class="icon-btn add-to-cart-btn" data-product-id="<?php echo (int) $product['id']; ?>" aria-label="Thêm vào giỏ hàng">
+                                <i class="fa-solid <?php echo htmlspecialchars($resolveProductTypeIcon($product['name'], 'best-seller')); ?>"></i>
+                            </button>
+                        </div>
                     </div>
-                    <h4>MacBook Air M2 16GB 512GB</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">31.490.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-laptop"></i> </button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">Best Seller</span>
-                    <div class="product-image-box">
-                        <img src="/LTWT6/img/uploads/4.webp" alt="LG Gram Book 16">
-                    </div>
-                    <h4>LG Gram Book 16 16GB 512GB</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">29.990.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-laptop"></i> </button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">Best Seller</span>
-                    <div class="product-image-box">
-                        <img src="/LTWT6/img/uploads/3.webp" alt="MSI Gaming Laptop">
-                    </div>
-                    <h4>MSI Gaming Laptop 16GB RTX</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">38.990.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-gamepad"></i> </button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">Best Seller</span>
-                    <div class="product-image-box">
-                        <img src="/LTWT6/img/uploads/2.webp" alt="ASUS Vivobook Flip">
-                    </div>
-                    <h4>ASUS Vivobook Flip 14" 8GB</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">18.990.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-laptop-code"></i></button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">Best Seller</span>
-                    <div class="product-image-box">
-                        <img src="/LTWT6/img/uploads/5.webp" alt="MacBook Air 15">
-                    </div>
-                    <h4>MacBook Air 15" 8GB 256GB</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">29.490.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-laptop"></i> </button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">Best Seller</span>
-                    <div class="product-image-box">
-                        <img src="/LTWT6/img/uploads/6.webp" alt="Gaming Keyboard">
-                    </div>
-                    <h4>Razer Gaming Keyboard</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">2.490.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-keyboard"></i> </button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">Best Seller</span>
-                    <div class="product-image-box">
-                        <img src="/LTWT6/img/uploads/8.webp" alt="Camera Lens">
-                    </div>
-                    <h4>Lens Máy Ảnh 50mm</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">1.290.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-camera"></i> </button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <span class="discount">Best Seller</span>
-                    <div class="product-image-box">
-                        <img src="/LTWT6/img/uploads/9.webp" alt="PS5 Controller">
-                    </div>
-                    <h4>Tay cầm PS5 DualSense</h4>
-                    <div class="rating">★★★★★</div>
-                    <div class="price">
-                        <span class="new-price">1.190.000₫</span>
-                    </div>
-                    <div class="product-action">
-                        <a href="product-detail.php">Xem chi tiết</a>
-                        <button><i class="fa-solid fa-gamepad"></i> </button>
-                    </div>
-                </div>
+                <?php endforeach; ?>
 
             </div>
 

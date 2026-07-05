@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/services.php';
 require_once __DIR__ . '/includes/customer-auth.php';
 
 if (isCustomerLoggedIn()) {
@@ -11,6 +12,12 @@ include 'includes/header.php';
 include 'includes/navbar.php';
 
 $message = '';
+$facebookLoginUrl = isFacebookLoginConfigured() ? buildFacebookLoginUrl() : 'facebook-login.php';
+
+if (isset($_GET['message'])) {
+    $message = trim((string) $_GET['message']);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
@@ -28,14 +35,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     }
 
     if ($isValid) {
-        $_SESSION['customer_id'] = (int) $customer['id'];
-        $_SESSION['customer_name'] = $customer['name'];
-        $_SESSION['customer_email'] = $customer['email'];
+        loginCustomerSession($customer);
         header('Location: index.php');
         exit;
     }
 
-    $message = 'Email hoặc mật khẩu không đúng.';
+    if ($customer && ($customer['password_hash'] ?? '') === '' && (($customer['auth_provider'] ?? '') === 'facebook')) {
+        $message = 'Tài khoản này đang đăng nhập bằng Facebook. Vui lòng chọn nút Facebook.';
+    } else {
+        $message = 'Email hoặc mật khẩu không đúng.';
+    }
 }
 ?>
 
@@ -64,6 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                     </div>
                     <button class="btn-login" type="submit">Đăng nhập</button>
                 </form>
+                <div class="auth-divider"><span>hoặc</span></div>
+                <a class="social-auth-btn facebook" href="<?php echo htmlspecialchars($facebookLoginUrl); ?>">
+                    <i class="fa-brands fa-facebook-f"></i>
+                    Tiếp tục với Facebook
+                </a>
                 <div class="login-footer">Chưa có tài khoản? <a href="register.php">Đăng ký ngay</a></div>
             </div>
         </div>

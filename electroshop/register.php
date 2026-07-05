@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/services.php';
 require_once __DIR__ . '/includes/customer-auth.php';
 
 if (isCustomerLoggedIn()) {
@@ -11,6 +12,12 @@ include 'includes/header.php';
 include 'includes/navbar.php';
 
 $message = '';
+$facebookLoginUrl = isFacebookLoginConfigured() ? buildFacebookLoginUrl() : 'facebook-login.php';
+
+if (isset($_GET['message'])) {
+    $message = trim((string) $_GET['message']);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $name = trim($_POST['name'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
@@ -33,9 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                 $stmt = $pdo->prepare('INSERT INTO customers (name, email, phone, address, password_hash) VALUES (?, ?, ?, ?, ?)');
                 $stmt->execute([$name, $email, $phone, '', $hashedPassword]);
                 $customerId = (int) $pdo->lastInsertId();
-                $_SESSION['customer_id'] = $customerId;
-                $_SESSION['customer_name'] = $name;
-                $_SESSION['customer_email'] = $email;
+                loginCustomerSession([
+                    'id' => $customerId,
+                    'name' => $name,
+                    'email' => $email,
+                    'auth_provider' => 'email',
+                    'avatar_url' => '',
+                ]);
                 header('Location: index.php');
                 exit;
             }
@@ -74,6 +85,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 <input type="password" name="confirm_password" required>
 <button class="btn-register" type="submit">Đăng ký</button>
 </form>
+<div class="auth-divider"><span>hoặc</span></div>
+<a class="social-auth-btn facebook" href="<?php echo htmlspecialchars($facebookLoginUrl); ?>">
+    <i class="fa-brands fa-facebook-f"></i>
+    Đăng ký nhanh với Facebook
+</a>
 <div class="register-footer">Đã có tài khoản? <a href="login.php">Đăng nhập</a></div>
 </div>
 </div>

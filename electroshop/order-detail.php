@@ -1,14 +1,15 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/services.php';
 require_once __DIR__ . '/includes/customer-auth.php';
 include 'includes/header.php';
 include 'includes/navbar.php';
 
 function buildVietQrUrl(float $amount, string $addInfo): string
 {
-    $bankBin = '970422';
-    $accountNo = '19037049999999';
-    $accountName = 'ELECTROSHOP';
+    $bankBin = '970403';
+    $accountNo = '040107386140';
+    $accountName = '';
 
     return 'https://img.vietqr.io/image/'
         . $bankBin . '-' . $accountNo . '-compact2.png'
@@ -39,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order'])) {
 }
 
 if ($orderId > 0) {
-    $stmt = $pdo->prepare('SELECT id, total, status, payment_method, payment_status, payment_note, created_at FROM orders WHERE id = ? AND customer_id = ?');
+    $stmt = $pdo->prepare('SELECT id, total, status, payment_method, payment_status, payment_note, payment_gateway_reference, payment_gateway_payload, created_at FROM orders WHERE id = ? AND customer_id = ?');
     $stmt->execute([$orderId, $customer['id']]);
     $order = $stmt->fetch();
 
@@ -76,7 +77,11 @@ if (!$order) {
                 Thanh toan:
                 <strong>
                     <?php
-                    $paymentMethodLabel = ($order['payment_method'] ?? 'cash') === 'transfer' ? 'Chuyen khoan' : 'COD';
+                    $paymentMethodLabel = match ($order['payment_method'] ?? 'cash') {
+                        'transfer' => 'Chuyen khoan',
+                        'momo' => 'MoMo',
+                        default => 'COD',
+                    };
                     $paymentStatusLabel = match ($order['payment_status'] ?? 'unpaid') {
                         'paid' => 'Da thanh toan',
                         'refunded' => 'Da hoan tien',
@@ -97,14 +102,35 @@ if (!$order) {
                 <?php $transferCode = 'ES' . date('Ymd', strtotime((string) $order['created_at'])) . '-' . (int) $order['id']; ?>
                 <div class="alert alert-info" style="margin-bottom: 20px;">
                     <p><strong>Don hang chua thanh toan. Vui long chuyen khoan theo thong tin sau:</strong></p>
-                    <p>Ngan hang: MB Bank</p>
-                    <p>So tai khoan: 19037049999999</p>
-                    <p>Chu tai khoan: ELECTROSHOP</p>
+                    <p>Ngan hang: Sacombank</p>
+                    <p>So tai khoan: 040107386140</p>
+                    <p>Chu tai khoan: TRAN TIN LOC</p>
                     <p>So tien: <?php echo number_format((float) $order['total'], 0, ',', '.'); ?> VND</p>
-                    <p>Noi dung CK: <strong><?php echo htmlspecialchars($transferCode); ?></strong></p>
+                    <div class="transfer-code-row">
+                        <p>Noi dung CK: <strong class="transfer-code-text"><?php echo htmlspecialchars($transferCode); ?></strong></p>
+                        <button type="button" class="copy-transfer-btn" data-copy-text="<?php echo htmlspecialchars($transferCode); ?>">Sao chép nội dung chuyển khoản</button>
+                    </div>
                     <div style="margin-top: 10px;">
                         <img src="<?php echo htmlspecialchars(buildVietQrUrl((float) $order['total'], $transferCode)); ?>" alt="VietQR" style="max-width: 220px; border: 1px solid #eee; border-radius: 8px;">
                     </div>
+                </div>
+            <?php endif; ?>
+
+            <?php if (($order['payment_method'] ?? 'cash') === 'momo' && ($order['payment_status'] ?? 'unpaid') === 'unpaid'): ?>
+                <?php $momoPayload = json_decode((string) ($order['payment_gateway_payload'] ?? ''), true) ?: []; ?>
+                <div id="payment-info" class="alert alert-info" style="margin-bottom: 20px;">
+                    <p><strong>Don hang chua thanh toan. Vui long thanh toan qua MoMo:</strong></p>
+                    <?php if (!empty($momoPayload['payUrl'])): ?>
+                        <p><a class="copy-transfer-btn" href="<?php echo htmlspecialchars((string) $momoPayload['payUrl']); ?>" target="_blank" rel="noopener noreferrer">Mở trang thanh toán MoMo</a></p>
+                    <?php endif; ?>
+                    <?php if (!empty($momoPayload['deeplink'])): ?>
+                        <p><a class="copy-transfer-btn" href="<?php echo htmlspecialchars((string) $momoPayload['deeplink']); ?>">Mở ứng dụng MoMo</a></p>
+                    <?php endif; ?>
+                    <?php if (!empty($momoPayload['qrCodeUrl'])): ?>
+                        <div style="margin-top: 10px;">
+                            <img src="<?php echo htmlspecialchars((string) $momoPayload['qrCodeUrl']); ?>" alt="MoMo QR" style="max-width: 220px; border: 1px solid #eee; border-radius: 8px;">
+                        </div>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
 

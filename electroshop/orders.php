@@ -28,6 +28,7 @@ function getPaymentMethodLabel(string $method): string
 {
     return match ($method) {
         'transfer' => 'Chuyen khoan',
+        'momo' => 'MoMo',
         default => 'COD',
     };
 }
@@ -43,7 +44,7 @@ function getPaymentStatusLabel(string $status): string
 
 function shouldShowPayNow(array $order): bool
 {
-    return ($order['payment_method'] ?? 'cash') === 'transfer'
+    return in_array(($order['payment_method'] ?? 'cash'), ['transfer', 'momo'], true)
         && ($order['payment_status'] ?? 'unpaid') === 'unpaid'
         && ($order['status'] ?? 'pending') === 'pending';
 }
@@ -79,7 +80,7 @@ function shouldShowPayNow(array $order): bool
                                     <div class="order-actions">
                                         <a class="order-action-link" href="order-detail.php?id=<?php echo (int) $order['id']; ?>">Xem chi tiết</a>
                                         <?php if (shouldShowPayNow($order)): ?>
-                                            <a class="order-action-link pay-now" href="order-detail.php?id=<?php echo (int) $order['id']; ?>#payment-info">Thanh toán ngay</a>
+                                            <a class="order-action-link pay-now" href="order-detail.php?id=<?php echo (int) $order['id']; ?>#payment-info"><?php echo ($order['payment_method'] ?? 'cash') === 'momo' ? 'Thanh toán MoMo' : 'Thanh toán ngay'; ?></a>
                                         <?php endif; ?>
                                     </div>
                                 </td>

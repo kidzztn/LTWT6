@@ -95,6 +95,7 @@ $recentOrders = $recentOrdersStmt->fetchAll();
 $paymentStats = [
     'cash' => ['orders' => 0, 'paid_revenue' => 0.0],
     'transfer' => ['orders' => 0, 'paid_revenue' => 0.0],
+    'momo' => ['orders' => 0, 'paid_revenue' => 0.0],
 ];
 
 $paymentStatsStmt = $pdo->prepare(
@@ -242,6 +243,12 @@ include __DIR__ . '/includes/header.php';
                     <p class="kpi-value"><?php echo number_format($paymentStats['transfer']['orders']); ?> đơn</p>
                     <p class="kpi-sub">Đã thu: <?php echo number_format($paymentStats['transfer']['paid_revenue'], 0, ',', '.'); ?>₫</p>
                 </div>
+
+                <div class="payment-kpi">
+                    <h4>MoMo</h4>
+                    <p class="kpi-value"><?php echo number_format($paymentStats['momo']['orders']); ?> đơn</p>
+                    <p class="kpi-sub">Đã thu: <?php echo number_format($paymentStats['momo']['paid_revenue'], 0, ',', '.'); ?>₫</p>
+                </div>
             </div>
 
             <div class="table-box">
@@ -354,7 +361,11 @@ include __DIR__ . '/includes/header.php';
                                     $statusText = 'Đã hủy';
                                 }
 
-                                $paymentMethodText = ($order['payment_method'] ?? 'cash') === 'transfer' ? 'Chuyển khoản' : 'COD';
+                                $paymentMethodText = match ($order['payment_method'] ?? 'cash') {
+                                    'transfer' => 'Chuyển khoản',
+                                    'momo' => 'MoMo',
+                                    default => 'COD',
+                                };
                                 $paymentStatusText = match ($order['payment_status'] ?? 'unpaid') {
                                     'paid' => 'Đã thanh toán',
                                     'refunded' => 'Đã hoàn tiền',

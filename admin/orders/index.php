@@ -142,7 +142,11 @@ $recentActivities = $pdo->query(
                                 </td>
                                 <td>
                                     <?php
-                                    $paymentMethodText = ($order['payment_method'] ?? 'cash') === 'transfer' ? 'Chuyen khoan' : 'COD';
+                                    $paymentMethodText = match ($order['payment_method'] ?? 'cash') {
+                                        'transfer' => 'Chuyen khoan',
+                                        'momo' => 'MoMo',
+                                        default => 'COD',
+                                    };
                                     $paymentStatusText = match ($order['payment_status'] ?? 'unpaid') {
                                         'paid' => 'Da thanh toan',
                                         'refunded' => 'Da hoan tien',

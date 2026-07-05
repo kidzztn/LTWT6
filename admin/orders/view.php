@@ -73,7 +73,11 @@ $items = $items->fetchAll();
                 <p><strong>Điện thoại:</strong> <?php echo htmlspecialchars($order['phone'] ?? '-'); ?></p>
                 <p><strong>Địa chỉ:</strong> <?php echo htmlspecialchars($order['address'] ?? '-'); ?></p>
                 <p><strong>Tổng tiền:</strong> <?php echo number_format((float) $order['total'], 0, ',', '.'); ?>đ</p>
-                <p><strong>Phuong thuc thanh toan:</strong> <?php echo (($order['payment_method'] ?? 'cash') === 'transfer') ? 'Chuyen khoan' : 'COD'; ?></p>
+                <p><strong>Phuong thuc thanh toan:</strong> <?php echo match ($order['payment_method'] ?? 'cash') {
+                    'transfer' => 'Chuyen khoan',
+                    'momo' => 'MoMo',
+                    default => 'COD',
+                }; ?></p>
                 <p><strong>Trang thai thanh toan:</strong> <?php echo htmlspecialchars(match ($order['payment_status'] ?? 'unpaid') {
                     'paid' => 'Da thanh toan',
                     'refunded' => 'Da hoan tien',

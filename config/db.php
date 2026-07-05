@@ -209,6 +209,32 @@ function ensureDatabaseSchema(PDO $pdo): void
         }
     }
 
+    $customerAlterColumns = [
+        "ALTER TABLE customers ADD COLUMN auth_provider VARCHAR(30) NOT NULL DEFAULT 'email'",
+        "ALTER TABLE customers ADD COLUMN facebook_id VARCHAR(120) DEFAULT NULL",
+        "ALTER TABLE customers ADD COLUMN avatar_url VARCHAR(255) DEFAULT NULL",
+    ];
+
+    foreach ($customerAlterColumns as $alterSql) {
+        try {
+            $pdo->exec($alterSql);
+        } catch (PDOException $e) {
+            if ($e->getCode() !== '42S21' &&
+                strpos($e->getMessage(), 'Duplicate column name') === false &&
+                strpos($e->getMessage(), 'already exists') === false) {
+                throw $e;
+            }
+        }
+    }
+
+    try {
+        $pdo->exec("ALTER TABLE customers ADD UNIQUE KEY uniq_customers_facebook_id (facebook_id)");
+    } catch (PDOException $e) {
+        if (strpos($e->getMessage(), 'Duplicate key name') === false && strpos($e->getMessage(), 'already exists') === false) {
+            throw $e;
+        }
+    }
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS orders (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -230,6 +256,31 @@ function ensureDatabaseSchema(PDO $pdo): void
     ];
 
     foreach ($orderAlterColumns as $alterSql) {
+        try {
+            $pdo->exec($alterSql);
+        } catch (PDOException $e) {
+            if ($e->getCode() !== '42S21' &&
+                strpos($e->getMessage(), 'Duplicate column name') === false &&
+                strpos($e->getMessage(), 'already exists') === false) {
+                throw $e;
+            }
+        }
+    }
+
+    try {
+        $pdo->exec("ALTER TABLE orders MODIFY COLUMN payment_method ENUM('cash','transfer','momo') NOT NULL DEFAULT 'cash'");
+    } catch (PDOException $e) {
+        if (strpos($e->getMessage(), 'Duplicate column name') === false && strpos($e->getMessage(), 'already exists') === false) {
+            throw $e;
+        }
+    }
+
+    $orderExtraColumns = [
+        "ALTER TABLE orders ADD COLUMN payment_gateway_reference VARCHAR(150) DEFAULT NULL",
+        "ALTER TABLE orders ADD COLUMN payment_gateway_payload TEXT DEFAULT NULL",
+    ];
+
+    foreach ($orderExtraColumns as $alterSql) {
         try {
             $pdo->exec($alterSql);
         } catch (PDOException $e) {
