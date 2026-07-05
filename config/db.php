@@ -131,6 +131,33 @@ function ensureDatabaseSchema(PDO $pdo): void
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
 
+    $productAlterColumns = [
+        'cpu'            => "ALTER TABLE products ADD COLUMN cpu VARCHAR(150) DEFAULT NULL",
+        'ram'            => "ALTER TABLE products ADD COLUMN ram VARCHAR(150) DEFAULT NULL",
+        'storage'        => "ALTER TABLE products ADD COLUMN storage VARCHAR(150) DEFAULT NULL",
+        'gpu'            => "ALTER TABLE products ADD COLUMN gpu VARCHAR(150) DEFAULT NULL",
+        'display'        => "ALTER TABLE products ADD COLUMN display VARCHAR(150) DEFAULT NULL",
+        'battery'        => "ALTER TABLE products ADD COLUMN battery VARCHAR(150) DEFAULT NULL",
+        'os'             => "ALTER TABLE products ADD COLUMN os VARCHAR(150) DEFAULT NULL",
+        'weight'         => "ALTER TABLE products ADD COLUMN weight VARCHAR(100) DEFAULT NULL",
+        'warranty'       => "ALTER TABLE products ADD COLUMN warranty VARCHAR(150) DEFAULT NULL",
+        'images'         => "ALTER TABLE products ADD COLUMN images TEXT DEFAULT NULL",
+        'specifications' => "ALTER TABLE products ADD COLUMN specifications TEXT DEFAULT NULL",
+    ];
+
+    foreach ($productAlterColumns as $columnName => $alterSql) {
+        try {
+            $pdo->exec($alterSql);
+        } catch (PDOException $e) {
+            // 42S21 = Duplicate column name (MySQL/MariaDB)
+            if ($e->getCode() !== '42S21' &&
+                strpos($e->getMessage(), 'Duplicate column name') === false &&
+                strpos($e->getMessage(), 'already exists') === false) {
+                throw $e;
+            }
+        }
+    }
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS customers (
             id INT AUTO_INCREMENT PRIMARY KEY,
