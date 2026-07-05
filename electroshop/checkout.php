@@ -71,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                 $customerId = (int) $pdo->lastInsertId();
             }
 
-            $stmt = $pdo->prepare('INSERT INTO orders (customer_id, total, status) VALUES (?, ?, "pending")');
             $validatedCartItems = [];
             $validatedTotal = 0;
             $productStmt = $pdo->prepare('SELECT id, name, price, stock FROM products WHERE id = ? FOR UPDATE');
@@ -101,7 +100,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                     'quantity' => $quantity,
                 ];
             }
+            $productStmt = null;
 
+            $stmt = $pdo->prepare('INSERT INTO orders (customer_id, total, status) VALUES (?, ?, "pending")');
             $stmt->execute([$customerId, (float) $validatedTotal]);
             $orderId = (int) $pdo->lastInsertId();
 
@@ -111,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                 $stmt->execute([$orderId, $item['id'], $item['name'], (float) $item['price'], (int) $item['quantity']]);
                 $updateStockStmt->execute([(int) $item['quantity'], (int) $item['id'], (int) $item['quantity']]);
                 if ($updateStockStmt->rowCount() === 0) {
-                    throw new RuntimeException('Không thể cập nhật tồn kho.');
+                    throw new RuntimeException('Không thể cập nhật tồn kho cho sản phẩm "' . $item['name'] . '".');
                 }
             }
 
