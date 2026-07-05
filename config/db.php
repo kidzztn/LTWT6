@@ -88,6 +88,14 @@ function ensureProductImages(PDO $pdo): void
 
 function ensureDatabaseSchema(PDO $pdo): void
 {
+    $pdo->exec(" 
+        CREATE TABLE IF NOT EXISTS system_settings (
+            setting_key VARCHAR(100) PRIMARY KEY,
+            setting_value TEXT DEFAULT NULL,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS admins (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -143,6 +151,8 @@ function ensureDatabaseSchema(PDO $pdo): void
         'warranty'       => "ALTER TABLE products ADD COLUMN warranty VARCHAR(150) DEFAULT NULL",
         'images'         => "ALTER TABLE products ADD COLUMN images TEXT DEFAULT NULL",
         'specifications' => "ALTER TABLE products ADD COLUMN specifications TEXT DEFAULT NULL",
+        'original_price' => "ALTER TABLE products ADD COLUMN original_price DECIMAL(12,0) NOT NULL DEFAULT 0",
+        'brand'          => "ALTER TABLE products ADD COLUMN brand VARCHAR(80) DEFAULT NULL",
     ];
 
     foreach ($productAlterColumns as $columnName => $alterSql) {
@@ -184,10 +194,31 @@ function ensureDatabaseSchema(PDO $pdo): void
             customer_id INT DEFAULT NULL,
             total DECIMAL(12,0) NOT NULL DEFAULT 0,
             status ENUM('pending','success','cancel') NOT NULL DEFAULT 'pending',
+            payment_method ENUM('cash','transfer') NOT NULL DEFAULT 'cash',
+            payment_status ENUM('unpaid','paid','refunded') NOT NULL DEFAULT 'unpaid',
+            payment_note TEXT DEFAULT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
+
+    $orderAlterColumns = [
+        "ALTER TABLE orders ADD COLUMN payment_method ENUM('cash','transfer') NOT NULL DEFAULT 'cash'",
+        "ALTER TABLE orders ADD COLUMN payment_status ENUM('unpaid','paid','refunded') NOT NULL DEFAULT 'unpaid'",
+        "ALTER TABLE orders ADD COLUMN payment_note TEXT DEFAULT NULL",
+    ];
+
+    foreach ($orderAlterColumns as $alterSql) {
+        try {
+            $pdo->exec($alterSql);
+        } catch (PDOException $e) {
+            if ($e->getCode() !== '42S21' &&
+                strpos($e->getMessage(), 'Duplicate column name') === false &&
+                strpos($e->getMessage(), 'already exists') === false) {
+                throw $e;
+            }
+        }
+    }
 
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS order_items (
@@ -199,6 +230,22 @@ function ensureDatabaseSchema(PDO $pdo): void
             quantity INT NOT NULL DEFAULT 1,
             FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
             FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+
+    $pdo->exec(" 
+        CREATE TABLE IF NOT EXISTS product_reviews (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            product_id INT NOT NULL,
+            customer_id INT NOT NULL,
+            rating TINYINT NOT NULL,
+            comment TEXT DEFAULT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uniq_product_customer (product_id, customer_id),
+            INDEX idx_product_created (product_id, created_at),
+            CONSTRAINT fk_product_reviews_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+            CONSTRAINT fk_product_reviews_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
 
@@ -228,6 +275,9 @@ function ensureDatabaseSchema(PDO $pdo): void
             (3, 'RTX 5070', 'rtx-5070', 21500000, 10, 'Card đồ họa chơi game/AI', '../img/uploads/3.webp')");
     }
 
+    $pdo->exec("UPDATE products SET original_price = ROUND(price * 1.15, 0) WHERE original_price IS NULL OR original_price <= price");
+    $pdo->exec("UPDATE products SET brand = 'Khac' WHERE brand IS NULL OR brand = ''");
+
     ensureProductImages($pdo);
 
     $customerCount = (int) $pdo->query("SELECT COUNT(*) FROM customers")->fetchColumn();
@@ -238,8 +288,14 @@ function ensureDatabaseSchema(PDO $pdo): void
             ('Lê Minh C', 'c.le@example.com', '0903333333')");
     }
 
+    $settingStmt = $pdo->prepare("SELECT setting_value FROM system_settings WHERE setting_key = ? LIMIT 1");
+    $upsertSettingStmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
+
+    $settingStmt->execute(['orders_seeded_once']);
+    $ordersSeededOnce = (string) ($settingStmt->fetchColumn() ?: '0');
+
     $orderCount = (int) $pdo->query("SELECT COUNT(*) FROM orders")->fetchColumn();
-    if ($orderCount === 0) {
+    if ($ordersSeededOnce !== '1' && $orderCount === 0) {
         $pdo->exec("INSERT INTO orders (customer_id, total, status) VALUES
             (1, 34990000, 'success'),
             (2, 28990000, 'pending'),
@@ -248,6 +304,12 @@ function ensureDatabaseSchema(PDO $pdo): void
             (1, 1, 'iPhone 16 Pro Max', 34990000, 1),
             (2, 2, 'Macbook Air M4', 28990000, 1),
             (3, 3, 'RTX 5070', 21500000, 1)");
+
+        $upsertSettingStmt->execute(['orders_seeded_once', '1']);
+    }
+
+    if ($ordersSeededOnce !== '1' && $orderCount > 0) {
+        $upsertSettingStmt->execute(['orders_seeded_once', '1']);
     }
 }
 

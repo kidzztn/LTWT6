@@ -17,7 +17,7 @@ if ($scriptPath !== '') {
 
     <title>ElectroShop Admin</title>
 
-    <link rel="stylesheet" href="<?php echo $adminAssetBase; ?>/assets/css/admin.css?v=1">
+    <link rel="stylesheet" href="<?php echo $adminAssetBase; ?>/assets/css/admin.css?v=7">
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">

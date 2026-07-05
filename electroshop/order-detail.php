@@ -4,6 +4,19 @@ require_once __DIR__ . '/includes/customer-auth.php';
 include 'includes/header.php';
 include 'includes/navbar.php';
 
+function buildVietQrUrl(float $amount, string $addInfo): string
+{
+    $bankBin = '970422';
+    $accountNo = '19037049999999';
+    $accountName = 'ELECTROSHOP';
+
+    return 'https://img.vietqr.io/image/'
+        . $bankBin . '-' . $accountNo . '-compact2.png'
+        . '?amount=' . (int) round($amount)
+        . '&addInfo=' . rawurlencode($addInfo)
+        . '&accountName=' . rawurlencode($accountName);
+}
+
 if (!isCustomerLoggedIn()) {
     header('Location: login.php');
     exit;
@@ -26,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order'])) {
 }
 
 if ($orderId > 0) {
-    $stmt = $pdo->prepare('SELECT id, total, status, created_at FROM orders WHERE id = ? AND customer_id = ?');
+    $stmt = $pdo->prepare('SELECT id, total, status, payment_method, payment_status, payment_note, created_at FROM orders WHERE id = ? AND customer_id = ?');
     $stmt->execute([$orderId, $customer['id']]);
     $order = $stmt->fetch();
 
@@ -58,6 +71,42 @@ if (!$order) {
                     default => 'Không rõ',
                 }); ?></strong>
             </div>
+
+            <div class="alert alert-info" style="margin-bottom: 20px;">
+                Thanh toan:
+                <strong>
+                    <?php
+                    $paymentMethodLabel = ($order['payment_method'] ?? 'cash') === 'transfer' ? 'Chuyen khoan' : 'COD';
+                    $paymentStatusLabel = match ($order['payment_status'] ?? 'unpaid') {
+                        'paid' => 'Da thanh toan',
+                        'refunded' => 'Da hoan tien',
+                        default => 'Chua thanh toan',
+                    };
+                    echo htmlspecialchars($paymentMethodLabel . ' - ' . $paymentStatusLabel);
+                    ?>
+                </strong>
+            </div>
+
+            <?php if (!empty($order['payment_note'])): ?>
+                <div class="alert alert-info" style="margin-bottom: 20px;">
+                    Ghi chu thanh toan: <?php echo htmlspecialchars((string) $order['payment_note']); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (($order['payment_method'] ?? 'cash') === 'transfer' && ($order['payment_status'] ?? 'unpaid') === 'unpaid'): ?>
+                <?php $transferCode = 'ES' . date('Ymd', strtotime((string) $order['created_at'])) . '-' . (int) $order['id']; ?>
+                <div class="alert alert-info" style="margin-bottom: 20px;">
+                    <p><strong>Don hang chua thanh toan. Vui long chuyen khoan theo thong tin sau:</strong></p>
+                    <p>Ngan hang: MB Bank</p>
+                    <p>So tai khoan: 19037049999999</p>
+                    <p>Chu tai khoan: ELECTROSHOP</p>
+                    <p>So tien: <?php echo number_format((float) $order['total'], 0, ',', '.'); ?> VND</p>
+                    <p>Noi dung CK: <strong><?php echo htmlspecialchars($transferCode); ?></strong></p>
+                    <div style="margin-top: 10px;">
+                        <img src="<?php echo htmlspecialchars(buildVietQrUrl((float) $order['total'], $transferCode)); ?>" alt="VietQR" style="max-width: 220px; border: 1px solid #eee; border-radius: 8px;">
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <div class="table-box" style="margin-bottom: 20px;">
                 <h3>Sản phẩm trong đơn</h3>

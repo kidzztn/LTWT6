@@ -2026,6 +2026,7 @@ button:hover{
 
 .description,
 .specification,
+.review-section,
 .related-product{
 
     margin:70px 0;
@@ -2081,6 +2082,204 @@ button:hover{
 .specification tr:nth-child(even){
 
     background:#fafafa;
+
+}
+
+
+/* ======================================================
+   REVIEWS
+====================================================== */
+
+.review-section .container{
+
+    background:#fff;
+
+    padding:35px;
+
+    border-radius:20px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
+
+}
+
+.review-summary-box{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    margin-top:20px;
+
+    padding:18px;
+
+    border:1px solid #f0f0f0;
+
+    border-radius:14px;
+
+    background:#fff7f7;
+
+}
+
+.review-summary-score{
+
+    font-size:34px;
+
+    font-weight:700;
+
+    color:var(--primary);
+
+    min-width:110px;
+
+}
+
+.review-summary-stars,
+.review-stars{
+
+    color:#ffb400;
+
+    letter-spacing:1px;
+
+}
+
+.review-form{
+
+    margin-top:20px;
+
+    border:1px solid #eee;
+
+    border-radius:14px;
+
+    padding:18px;
+
+}
+
+.review-form h3{
+
+    margin-bottom:12px;
+
+}
+
+.review-form-row{
+
+    margin-bottom:12px;
+
+}
+
+.review-form-row label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+}
+
+.review-form-row select,
+.review-form-row textarea{
+
+    width:100%;
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+    padding:10px 12px;
+
+    font-size:15px;
+
+}
+
+.btn-review-submit{
+
+    height:46px;
+
+    padding:0 18px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:var(--primary);
+
+    color:#fff;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+}
+
+.review-note,
+.review-empty{
+
+    margin-top:16px;
+
+    padding:14px 16px;
+
+    background:#f6f7f9;
+
+    border-radius:10px;
+
+    color:#333;
+
+}
+
+.review-list{
+
+    margin-top:20px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.review-item{
+
+    border:1px solid #eee;
+
+    border-radius:12px;
+
+    padding:14px 16px;
+
+    background:#fff;
+
+}
+
+.review-item-top{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:8px;
+
+    gap:10px;
+
+}
+
+.review-item p{
+
+    margin-bottom:8px;
+
+    color:#333;
+
+    line-height:1.6;
+
+}
+
+.review-item time{
+
+    color:#7a7a7a;
+
+    font-size:13px;
 
 }
 

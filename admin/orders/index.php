@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 }
 
 $orders = $pdo->query(
-    "SELECT o.id, c.name AS customer_name, o.total, o.status, o.created_at
+    "SELECT o.id, c.name AS customer_name, o.total, o.status, o.payment_method, o.payment_status, o.created_at
      FROM orders o
      LEFT JOIN customers c ON c.id = o.customer_id
      ORDER BY o.id DESC"
@@ -59,6 +59,7 @@ $orders = $pdo->query(
                         <th>Khách hàng</th>
                         <th>Tổng tiền</th>
                         <th>Trạng thái</th>
+                        <th>Thanh toan</th>
                         <th>Ngày tạo</th>
                         <th>Hành động</th>
                     </tr>
@@ -80,6 +81,17 @@ $orders = $pdo->query(
                                 }
                                 ?>
                                 <span class="status <?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
+                            </td>
+                            <td>
+                                <?php
+                                $paymentMethodText = ($order['payment_method'] ?? 'cash') === 'transfer' ? 'Chuyen khoan' : 'COD';
+                                $paymentStatusText = match ($order['payment_status'] ?? 'unpaid') {
+                                    'paid' => 'Da thanh toan',
+                                    'refunded' => 'Da hoan tien',
+                                    default => 'Chua thanh toan',
+                                };
+                                ?>
+                                <span><?php echo htmlspecialchars($paymentMethodText . ' - ' . $paymentStatusText); ?></span>
                             </td>
                             <td><?php echo htmlspecialchars($order['created_at']); ?></td>
                             <td>

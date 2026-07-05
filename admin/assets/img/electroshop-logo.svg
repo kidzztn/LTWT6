@@ -1,0 +1,12 @@
+<svg width="720" height="220" viewBox="0 0 720 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGrad" x1="20" y1="20" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF4D64"/>
+      <stop offset="1" stop-color="#C1121F"/>
+    </linearGradient>
+  </defs>
+  <rect x="20" y="20" width="170" height="170" rx="44" fill="url(#logoGrad)"/>
+  <path d="M114 44L84 108H118L92 170L142 96H108L130 44H114Z" fill="white"/>
+  <text x="220" y="112" fill="#FFFFFF" font-family="Poppins, Arial, sans-serif" font-size="74" font-weight="700">ElectroShop</text>
+  <text x="225" y="154" fill="#D4D7DE" font-family="Poppins, Arial, sans-serif" font-size="22" letter-spacing="4">ADMIN CONTROL CENTER</text>
+</svg>

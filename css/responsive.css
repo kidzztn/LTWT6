@@ -313,6 +313,22 @@
 
 }
 
+.review-summary-box{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
+.review-item-top{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
 .cart-table{
 
     display:block;
@@ -427,6 +443,20 @@
 .price-box .new-price{
 
     font-size:28px;
+
+}
+
+.review-section .container{
+
+    padding:20px;
+
+}
+
+.review-summary-score{
+
+    font-size:28px;
+
+    min-width:auto;
 
 }
 

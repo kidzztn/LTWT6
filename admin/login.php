@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <title>ElectroShop Admin Login</title>
 
-    <link rel="stylesheet" href="<?php echo $adminAssetBase; ?>/assets/css/admin.css?v=1">
+    <link rel="stylesheet" href="<?php echo $adminAssetBase; ?>/assets/css/admin.css?v=6">
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -78,7 +78,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="overlay">
 
-            <h1>ElectroShop</h1>
+            <div class="brand-mark">
+                <img
+                    class="brand-logo-image"
+                    src="<?php echo $adminAssetBase; ?>/assets/img/electroshop-logo.svg"
+                    alt="ElectroShop logo"
+                >
+            </div>
+
+            <p class="brand-note">Nền tảng quản trị bán hàng, đơn hàng và thanh toán.</p>
 
         </div>
 
@@ -87,6 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-right">
 
         <div class="login-box">
+
+            <span class="admin-pill">ADMIN PANEL</span>
 
             <h2>Đăng nhập Admin</h2>
 

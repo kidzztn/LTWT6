@@ -1,3 +1,10 @@
+<?php
+$currentPath = $_SERVER['REQUEST_URI'] ?? '';
+$isActive = static function (string $needle) use ($currentPath): string {
+    return strpos($currentPath, $needle) !== false ? 'active' : '';
+};
+?>
+
 <div class="sidebar">
 
     <div class="logo">
@@ -8,7 +15,7 @@
 
     <ul>
 
-        <li class="active">
+        <li class="<?php echo $isActive('/admin/index.php'); ?>">
 
             <a href="/LTWT6/admin/index.php">
 
@@ -20,7 +27,7 @@
 
         </li>
 
-        <li>
+        <li class="<?php echo $isActive('/admin/products/'); ?>">
 
             <a href="/LTWT6/admin/products/index.php">
 
@@ -32,7 +39,7 @@
 
         </li>
 
-        <li>
+        <li class="<?php echo $isActive('/admin/categories/'); ?>">
 
             <a href="/LTWT6/admin/categories/index.php">
 
@@ -44,7 +51,7 @@
 
         </li>
 
-        <li>
+        <li class="<?php echo $isActive('/admin/orders/'); ?>">
 
             <a href="/LTWT6/admin/orders/index.php">
 
@@ -56,7 +63,7 @@
 
         </li>
 
-        <li>
+        <li class="<?php echo $isActive('/admin/users/'); ?>">
 
             <a href="/LTWT6/admin/users/index.php">
 

@@ -10,7 +10,7 @@ if (!isCustomerLoggedIn()) {
 }
 
 $customer = getCurrentCustomer();
-$stmt = $pdo->prepare('SELECT id, total, status, created_at FROM orders WHERE customer_id = ? ORDER BY id DESC');
+$stmt = $pdo->prepare('SELECT id, total, status, payment_method, payment_status, created_at FROM orders WHERE customer_id = ? ORDER BY id DESC');
 $stmt->execute([$customer['id']]);
 $orders = $stmt->fetchAll();
 
@@ -21,6 +21,23 @@ function getOrderStatusLabel(string $status): string
         'success' => 'Đã thanh toán',
         'cancel' => 'Đã hủy',
         default => 'Không rõ',
+    };
+}
+
+function getPaymentMethodLabel(string $method): string
+{
+    return match ($method) {
+        'transfer' => 'Chuyen khoan',
+        default => 'COD',
+    };
+}
+
+function getPaymentStatusLabel(string $status): string
+{
+    return match ($status) {
+        'paid' => 'Da thanh toan',
+        'refunded' => 'Da hoan tien',
+        default => 'Chua thanh toan',
     };
 }
 ?>
@@ -38,6 +55,7 @@ function getOrderStatusLabel(string $status): string
                             <th>Mã đơn</th>
                             <th>Tổng tiền</th>
                             <th>Trạng thái</th>
+                            <th>Thanh toan</th>
                             <th>Ngày đặt</th>
                         </tr>
                     </thead>
@@ -47,6 +65,7 @@ function getOrderStatusLabel(string $status): string
                                 <td><a href="order-detail.php?id=<?php echo (int) $order['id']; ?>">#<?php echo (int) $order['id']; ?></a></td>
                                 <td><?php echo number_format((float) $order['total'], 0, ',', '.'); ?>₫</td>
                                 <td><?php echo htmlspecialchars(getOrderStatusLabel($order['status'])); ?></td>
+                                <td><?php echo htmlspecialchars(getPaymentMethodLabel((string) ($order['payment_method'] ?? 'cash')) . ' - ' . getPaymentStatusLabel((string) ($order['payment_status'] ?? 'unpaid'))); ?></td>
                                 <td><?php echo htmlspecialchars($order['created_at']); ?></td>
                             </tr>
                         <?php endforeach; ?>

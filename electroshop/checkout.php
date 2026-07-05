@@ -5,6 +5,19 @@ require_once __DIR__ . '/includes/customer-auth.php';
 include 'includes/header.php';
 include 'includes/navbar.php';
 
+function buildVietQrUrl(float $amount, string $addInfo): string
+{
+    $bankBin = '970422';
+    $accountNo = '19037049999999';
+    $accountName = 'ELECTROSHOP';
+
+    return 'https://img.vietqr.io/image/'
+        . $bankBin . '-' . $accountNo . '-compact2.png'
+        . '?amount=' . (int) round($amount)
+        . '&addInfo=' . rawurlencode($addInfo)
+        . '&accountName=' . rawurlencode($accountName);
+}
+
 $cart = getCart();
 $cartItems = [];
 $total = 0.0;
@@ -25,6 +38,7 @@ $successMessage = '';
 $errorMessage   = '';
 $loggedCustomer = getCurrentCustomer();
 $customerProfile = null;
+$latestTransferInfo = null;
 
 $loggedCustomerId = isset($loggedCustomer['id']) ? (int)$loggedCustomer['id'] : 0;
 
@@ -43,6 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     $phone   = trim($_POST['phone'] ?? '');
     $email   = trim($_POST['email'] ?? '');
     $address = trim($_POST['address'] ?? '');
+    $paymentMethod = $_POST['payment_method'] ?? 'cash';
+    $note = trim($_POST['note'] ?? '');
+
+    if (!in_array($paymentMethod, ['cash', 'transfer'], true)) {
+        $paymentMethod = 'cash';
+    }
 
     if ($name === '' || $phone === '' || $address === '') {
         $errorMessage = 'Vui lòng nhập đầy đủ họ tên, số điện thoại và địa chỉ.';
@@ -94,8 +114,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             }
 
             // 4) Tạo order
-            $insOrder = $pdo->prepare('INSERT INTO orders (customer_id, total, status) VALUES (?, ?, "pending")');
-            $insOrder->execute([$customerId, (float)$total]);
+            $paymentStatus = $paymentMethod === 'transfer' ? 'unpaid' : 'unpaid';
+            $insOrder = $pdo->prepare('INSERT INTO orders (customer_id, total, status, payment_method, payment_status, payment_note) VALUES (?, ?, "pending", ?, ?, ?)');
+            $insOrder->execute([$customerId, (float)$total, $paymentMethod, $paymentStatus, $note !== '' ? $note : null]);
             $orderId = (int)$pdo->lastInsertId();
 
             if ($orderId <= 0) {
@@ -131,6 +152,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             clearCart();
 
             $successMessage = 'Đặt hàng thành công. Mã đơn hàng #' . $orderId;
+
+            if ($paymentMethod === 'transfer') {
+                $transferCode = 'ES' . date('Ymd') . '-' . $orderId;
+                $latestTransferInfo = [
+                    'code' => $transferCode,
+                    'amount' => (float) $total,
+                    'qr_url' => buildVietQrUrl((float) $total, $transferCode),
+                    'bank_name' => 'MB Bank',
+                    'account_no' => '19037049999999',
+                    'account_name' => 'ELECTROSHOP',
+                ];
+            }
         } catch (Throwable $e) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
@@ -155,6 +188,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
                     <?php if (!empty($successMessage)): ?>
                         <div class="alert alert-success"><?php echo htmlspecialchars($successMessage); ?></div>
+
+                        <?php if ($latestTransferInfo): ?>
+                            <div class="alert alert-info" style="margin-top: 12px;">
+                                <p><strong>Thong tin chuyen khoan:</strong></p>
+                                <p>Ngan hang: <?php echo htmlspecialchars($latestTransferInfo['bank_name']); ?></p>
+                                <p>So tai khoan: <?php echo htmlspecialchars($latestTransferInfo['account_no']); ?></p>
+                                <p>Chu tai khoan: <?php echo htmlspecialchars($latestTransferInfo['account_name']); ?></p>
+                                <p>So tien: <?php echo number_format((float) $latestTransferInfo['amount'], 0, ',', '.'); ?> VND</p>
+                                <p>Noi dung CK: <strong><?php echo htmlspecialchars($latestTransferInfo['code']); ?></strong></p>
+                                <div style="margin-top: 10px;">
+                                    <img src="<?php echo htmlspecialchars($latestTransferInfo['qr_url']); ?>" alt="VietQR" style="max-width: 220px; border: 1px solid #eee; border-radius: 8px;">
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     <?php endif; ?>
 
                     <?php if (!empty($errorMessage)): ?>

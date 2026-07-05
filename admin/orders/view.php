@@ -9,9 +9,10 @@ $errorMessage = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $status = $_POST['status'] ?? 'pending';
-    if (in_array($status, ['pending', 'success', 'cancel'], true)) {
-        $stmt = $pdo->prepare('UPDATE orders SET status = ? WHERE id = ?');
-        $stmt->execute([$status, $id]);
+    $paymentStatus = $_POST['payment_status'] ?? 'unpaid';
+    if (in_array($status, ['pending', 'success', 'cancel'], true) && in_array($paymentStatus, ['unpaid', 'paid', 'refunded'], true)) {
+        $stmt = $pdo->prepare('UPDATE orders SET status = ?, payment_status = ? WHERE id = ?');
+        $stmt->execute([$status, $paymentStatus, $id]);
         $successMessage = 'Cập nhật trạng thái đơn hàng thành công.';
     } else {
         $errorMessage = 'Trạng thái không hợp lệ.';
@@ -20,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
 
 if ($id > 0) {
     $stmt = $pdo->prepare(
-        "SELECT o.id, o.total, o.status, o.created_at, c.name AS customer_name, c.email, c.phone, c.address
+        "SELECT o.id, o.total, o.status, o.payment_method, o.payment_status, o.payment_note, o.created_at, c.name AS customer_name, c.email, c.phone, c.address
          FROM orders o
          LEFT JOIN customers c ON c.id = o.customer_id
          WHERE o.id = ?"
@@ -72,6 +73,15 @@ $items = $items->fetchAll();
                 <p><strong>Điện thoại:</strong> <?php echo htmlspecialchars($order['phone'] ?? '-'); ?></p>
                 <p><strong>Địa chỉ:</strong> <?php echo htmlspecialchars($order['address'] ?? '-'); ?></p>
                 <p><strong>Tổng tiền:</strong> <?php echo number_format((float) $order['total'], 0, ',', '.'); ?>đ</p>
+                <p><strong>Phuong thuc thanh toan:</strong> <?php echo (($order['payment_method'] ?? 'cash') === 'transfer') ? 'Chuyen khoan' : 'COD'; ?></p>
+                <p><strong>Trang thai thanh toan:</strong> <?php echo htmlspecialchars(match ($order['payment_status'] ?? 'unpaid') {
+                    'paid' => 'Da thanh toan',
+                    'refunded' => 'Da hoan tien',
+                    default => 'Chua thanh toan',
+                }); ?></p>
+                <?php if (!empty($order['payment_note'])): ?>
+                    <p><strong>Ghi chu thanh toan:</strong> <?php echo htmlspecialchars((string) $order['payment_note']); ?></p>
+                <?php endif; ?>
                 <p><strong>Ngày tạo:</strong> <?php echo htmlspecialchars($order['created_at']); ?></p>
 
                 <form method="post" style="margin-top:15px;">
@@ -81,6 +91,12 @@ $items = $items->fetchAll();
                         <option value="pending" <?php echo $order['status'] === 'pending' ? 'selected' : ''; ?>>Đang xử lý</option>
                         <option value="success" <?php echo $order['status'] === 'success' ? 'selected' : ''; ?>>Đã thanh toán</option>
                         <option value="cancel" <?php echo $order['status'] === 'cancel' ? 'selected' : ''; ?>>Đã hủy</option>
+                    </select>
+                    <label for="payment_status" style="display:block;margin-top:10px;margin-bottom:6px;"><strong>Thanh toan:</strong></label>
+                    <select name="payment_status" id="payment_status">
+                        <option value="unpaid" <?php echo ($order['payment_status'] ?? 'unpaid') === 'unpaid' ? 'selected' : ''; ?>>Chua thanh toan</option>
+                        <option value="paid" <?php echo ($order['payment_status'] ?? 'unpaid') === 'paid' ? 'selected' : ''; ?>>Da thanh toan</option>
+                        <option value="refunded" <?php echo ($order['payment_status'] ?? 'unpaid') === 'refunded' ? 'selected' : ''; ?>>Da hoan tien</option>
                     </select>
                     <button type="submit" class="btn-primary" style="margin-left:10px;">Cập nhật</button>
                 </form>
