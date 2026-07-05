@@ -188,7 +188,7 @@ function ensureDatabaseSchema(PDO $pdo): void
             total DECIMAL(12,0) NOT NULL DEFAULT 0,
             status ENUM('pending','success','cancel') NOT NULL DEFAULT 'pending',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL
+            FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL ON UPDATE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
 
